@@ -49,7 +49,7 @@ create table public.subscriptions (
   stripe_customer_id text unique,
   stripe_subscription_id text unique,
   plan text not null default 'free' check (plan in ('free', 'pro', 'team')),
-  status text not null default 'active' check (status in ('active', 'canceled', 'past_due', 'trialing')),
+  status text not null default 'active' check (status in ('active', 'canceled', 'past_due', 'trialing', 'incomplete')),
   current_period_end timestamptz,
   created_at timestamptz default now() not null,
   updated_at timestamptz default now() not null

@@ -14,6 +14,7 @@ import {
   Zap,
   Users,
   ArrowRight,
+  Settings,
 } from "lucide-react";
 import { createClient } from "~/lib/supabase/client";
 import { Button } from "~/components/ui/button";
@@ -61,7 +62,7 @@ function LandingPage() {
           </h2>
           <div className="grid gap-8 sm:grid-cols-3">
             <div className="text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded bg-primary/10">
                 <Zap className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-semibold text-foreground mb-2">
@@ -72,7 +73,7 @@ function LandingPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded bg-primary/10">
                 <Shield className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-semibold text-foreground mb-2">
@@ -83,7 +84,7 @@ function LandingPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded bg-primary/10">
                 <Users className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-semibold text-foreground mb-2">
@@ -114,14 +115,8 @@ function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-border py-8">
-        <div className="mx-auto max-w-5xl px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded bg-primary">
-              <Video className="h-3.5 w-3.5 text-primary-foreground" />
-            </div>
-            <span className="text-sm font-semibold text-foreground">Module</span>
-          </div>
-          <p className="text-xs text-muted-foreground">
+        <div className="mx-auto max-w-5xl px-6 text-center">
+          <p className="text-sm text-muted-foreground">
             Built by George Holmes
           </p>
         </div>
@@ -220,9 +215,9 @@ function Dashboard() {
             <button
               onClick={createMeeting}
               disabled={creating}
-              className="flex items-center gap-4 rounded-lg border border-border bg-card p-5 text-left transition-colors hover:border-primary/30 hover:bg-accent/30"
+              className="flex items-center gap-4 rounded border border-border bg-card p-5 text-left transition-colors hover:border-primary/30 hover:bg-accent/30"
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-primary/10">
                 <Plus className="h-6 w-6 text-primary" />
               </div>
               <div>
@@ -237,9 +232,9 @@ function Dashboard() {
 
             <form
               onSubmit={handleJoin}
-              className="flex items-center gap-3 rounded-lg border border-border bg-card p-5"
+              className="flex items-center gap-3 rounded border border-border bg-card p-5"
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-primary/10">
                 <LinkIcon className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
@@ -263,6 +258,19 @@ function Dashboard() {
               </Button>
             </form>
           </div>
+
+          <Link
+            href="/settings"
+            className="mt-4 flex items-center gap-3 rounded border border-border bg-card p-4 transition-colors hover:border-primary/30 hover:bg-accent/30"
+          >
+            <Settings className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <p className="text-sm font-medium text-foreground">Settings</p>
+              <p className="text-xs text-muted-foreground">
+                Manage your profile, billing, and preferences
+              </p>
+            </div>
+          </Link>
         </div>
 
         {/* Meeting history */}
@@ -276,12 +284,12 @@ function Dashboard() {
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="h-16 animate-pulse rounded-lg border border-border bg-card"
+                  className="h-16 animate-pulse rounded border border-border bg-card"
                 />
               ))}
             </div>
           ) : meetings.length === 0 ? (
-            <div className="rounded-lg border border-border bg-card py-12 text-center">
+            <div className="rounded border border-border bg-card py-12 text-center">
               <Video className="mx-auto h-8 w-8 text-muted-foreground/50 mb-3" />
               <p className="text-sm text-muted-foreground mb-4">
                 No meetings yet. Start your first one above.
@@ -292,9 +300,9 @@ function Dashboard() {
               {meetings.map((meeting) => (
                 <div
                   key={meeting.id}
-                  className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 transition-colors hover:border-border/80"
+                  className="flex items-center gap-3 rounded border border-border bg-card px-4 py-3 transition-colors hover:border-border/80"
                 >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-primary/10 text-primary">
                     <Video className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">

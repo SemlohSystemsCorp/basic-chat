@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       const subscription = await stripe.subscriptions.retrieve(
         session.subscription as string
       );
+      const periodEnd = (subscription as unknown as Record<string, unknown>).current_period_end as number;
 
       await supabaseAdmin.from("subscriptions").upsert(
         {
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
           plan,
           status: "active",
           current_period_end: new Date(
-            subscription.current_period_end * 1000
+            periodEnd * 1000
           ).toISOString(),
           updated_at: new Date().toISOString(),
         },
@@ -56,17 +57,18 @@ export async function POST(request: Request) {
 
     case "invoice.payment_succeeded": {
       const invoice = event.data.object as Stripe.Invoice;
-      const subId = invoice.subscription as string;
+      const subId = (invoice as unknown as Record<string, unknown>).subscription as string;
       if (!subId) break;
 
       const subscription = await stripe.subscriptions.retrieve(subId);
+      const periodEnd = (subscription as unknown as Record<string, unknown>).current_period_end as number;
 
       await supabaseAdmin
         .from("subscriptions")
         .update({
           status: "active",
           current_period_end: new Date(
-            subscription.current_period_end * 1000
+            periodEnd * 1000
           ).toISOString(),
           updated_at: new Date().toISOString(),
         })
@@ -76,7 +78,7 @@ export async function POST(request: Request) {
 
     case "invoice.payment_failed": {
       const invoice = event.data.object as Stripe.Invoice;
-      const subId = invoice.subscription as string;
+      const subId = (invoice as unknown as Record<string, unknown>).subscription as string;
       if (!subId) break;
 
       await supabaseAdmin
@@ -105,6 +107,7 @@ export async function POST(request: Request) {
 
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
+      const periodEnd = (subscription as unknown as Record<string, unknown>).current_period_end as number;
 
       const status = subscription.cancel_at_period_end
         ? "canceled"
@@ -119,7 +122,7 @@ export async function POST(request: Request) {
         .update({
           status,
           current_period_end: new Date(
-            subscription.current_period_end * 1000
+            periodEnd * 1000
           ).toISOString(),
           updated_at: new Date().toISOString(),
         })

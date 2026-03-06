@@ -105,8 +105,16 @@ export function Sidebar() {
       {/* User header */}
       <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-primary text-[10px] font-bold text-primary-foreground">
-            {user.username[0].toUpperCase()}
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground overflow-hidden">
+            {user.avatar_url ? (
+              <img
+                src={user.avatar_url}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              user.username[0].toUpperCase()
+            )}
           </div>
           <span className="text-sm font-semibold text-foreground truncate max-w-[120px]">
             {user.display_name || user.username}

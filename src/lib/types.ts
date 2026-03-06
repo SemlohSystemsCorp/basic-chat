@@ -26,7 +26,7 @@ export type Subscription = {
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   plan: "free" | "pro" | "team";
-  status: "active" | "canceled" | "past_due" | "trialing";
+  status: "active" | "canceled" | "past_due" | "trialing" | "incomplete";
   current_period_end: string | null;
   created_at: string;
   updated_at: string;

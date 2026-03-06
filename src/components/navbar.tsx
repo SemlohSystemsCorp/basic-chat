@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Video, LogOut, Settings, CreditCard, User } from "lucide-react";
 import { createClient } from "~/lib/supabase/client";
-import { Button } from "~/components/ui/button";
 import type { Profile } from "~/lib/types";
 
 export function Navbar() {
@@ -52,9 +51,17 @@ export function Navbar() {
           <div className="relative">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90 overflow-hidden"
             >
-              {user.username[0].toUpperCase()}
+              {user.avatar_url ? (
+                <img
+                  src={user.avatar_url}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                user.username[0].toUpperCase()
+              )}
             </button>
 
             {menuOpen && (
@@ -109,16 +116,7 @@ export function Navbar() {
               </>
             )}
           </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/auth/login">Log in</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link href="/auth/signup">Sign up</Link>
-            </Button>
-          </div>
-        )}
+        ) : null}
       </div>
     </nav>
   );
