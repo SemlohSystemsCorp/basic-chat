@@ -3,6 +3,7 @@
 -- WARNING: This deletes ALL data. Only use to start fresh.
 
 -- Drop tables in correct order (respecting foreign keys)
+drop table if exists public.subscriptions cascade;
 drop table if exists public.chat_messages cascade;
 drop table if exists public.verification_codes cascade;
 drop table if exists public.meetings cascade;

@@ -42,6 +42,19 @@ create table public.chat_messages (
   created_at timestamptz default now() not null
 );
 
+-- Subscriptions table (Stripe billing)
+create table public.subscriptions (
+  id bigint default generate_numeric_id() primary key,
+  user_id uuid references public.profiles(id) on delete cascade not null unique,
+  stripe_customer_id text unique,
+  stripe_subscription_id text unique,
+  plan text not null default 'free' check (plan in ('free', 'pro', 'team')),
+  status text not null default 'active' check (status in ('active', 'canceled', 'past_due', 'trialing')),
+  current_period_end timestamptz,
+  created_at timestamptz default now() not null,
+  updated_at timestamptz default now() not null
+);
+
 -- Verification codes table (email verification + password reset)
 create table public.verification_codes (
   id bigint default generate_numeric_id() primary key,
@@ -57,6 +70,7 @@ create table public.verification_codes (
 alter table public.profiles enable row level security;
 alter table public.meetings enable row level security;
 alter table public.chat_messages enable row level security;
+alter table public.subscriptions enable row level security;
 alter table public.verification_codes enable row level security;
 
 -- Profiles policies
@@ -78,6 +92,13 @@ create policy "Anyone can send chat messages" on public.chat_messages
 
 create policy "Anyone can delete chat messages" on public.chat_messages
   for delete using (true);
+
+-- Subscriptions policies
+create policy "Users can view their own subscription" on public.subscriptions
+  for select using (auth.uid() = user_id);
+
+create policy "Users can insert their own subscription" on public.subscriptions
+  for insert with check (auth.uid() = user_id);
 
 -- Meetings policies
 create policy "Meetings are viewable by everyone" on public.meetings
@@ -121,3 +142,6 @@ create index idx_chat_messages_room on public.chat_messages(room_name);
 create index idx_chat_messages_created on public.chat_messages(created_at);
 create index idx_verification_codes_email on public.verification_codes(email);
 create index idx_verification_codes_code on public.verification_codes(code);
+create index idx_subscriptions_user on public.subscriptions(user_id);
+create index idx_subscriptions_stripe_customer on public.subscriptions(stripe_customer_id);
+create index idx_subscriptions_stripe_sub on public.subscriptions(stripe_subscription_id);

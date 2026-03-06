@@ -19,3 +19,15 @@ export type Meeting = {
   created_at: string;
   host?: Profile;
 };
+
+export type Subscription = {
+  id: number;
+  user_id: string;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  plan: "free" | "pro" | "team";
+  status: "active" | "canceled" | "past_due" | "trialing";
+  current_period_end: string | null;
+  created_at: string;
+  updated_at: string;
+};
