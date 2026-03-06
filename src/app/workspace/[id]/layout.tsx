@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { WorkspaceSidebar } from "~/components/workspace-sidebar";
+import { WorkspaceIdProvider } from "~/lib/workspace-context";
 
 export default function WorkspaceLayout({
   children,
@@ -12,9 +13,11 @@ export default function WorkspaceLayout({
   const id = params.id as string;
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <WorkspaceSidebar workspaceId={id} />
-      <main className="flex-1 overflow-hidden">{children}</main>
-    </div>
+    <WorkspaceIdProvider workspaceId={id}>
+      <div className="flex h-screen overflow-hidden">
+        <WorkspaceSidebar workspaceId={id} />
+        <main className="flex-1 overflow-hidden">{children}</main>
+      </div>
+    </WorkspaceIdProvider>
   );
 }

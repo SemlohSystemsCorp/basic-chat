@@ -11,7 +11,6 @@ import type { Channel, ChannelMessage, Profile } from "~/lib/types";
 export default function ChannelPage() {
   const params = useParams();
   const supabase = createClient();
-  const workspaceId = params.id as string;
   const channelId = params.channelId as string;
 
   const [channel, setChannel] = useState<Channel | null>(null);

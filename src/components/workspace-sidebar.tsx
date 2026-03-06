@@ -12,7 +12,9 @@ import {
   MessageSquare,
   ChevronDown,
   Users,
-  Search,
+  Globe,
+  Copy,
+  Check,
 } from "lucide-react";
 import { createClient } from "~/lib/supabase/client";
 import { Button } from "~/components/ui/button";
@@ -29,6 +31,13 @@ export function WorkspaceSidebar({ workspaceId }: { workspaceId: string }) {
   const [loading, setLoading] = useState(true);
   const [addingChannel, setAddingChannel] = useState(false);
   const [newChannelName, setNewChannelName] = useState("");
+  const [copiedUrl, setCopiedUrl] = useState(false);
+
+  // Detect the base path: /workspace/123 or /workspace/s/slug
+  const slugMatch = pathname.match(/^\/workspace\/s\/([^/]+)/);
+  const basePath = slugMatch
+    ? `/workspace/s/${slugMatch[1]}`
+    : `/workspace/${workspaceId}`;
 
   useEffect(() => {
     loadData();
@@ -102,8 +111,15 @@ export function WorkspaceSidebar({ workspaceId }: { workspaceId: string }) {
       setChannels((prev) => [...prev, channel]);
       setAddingChannel(false);
       setNewChannelName("");
-      router.push(`/workspace/${workspaceId}/channel/${channel.id}`);
+      router.push(`${basePath}/channel/${channel.id}`);
     }
+  }
+
+  function copySubdomainUrl() {
+    if (!workspace) return;
+    navigator.clipboard.writeText(`https://${workspace.slug}.georgeholmes.io`);
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
   }
 
   if (loading) {
@@ -116,37 +132,52 @@ export function WorkspaceSidebar({ workspaceId }: { workspaceId: string }) {
     );
   }
 
-  // Other members (for DMs) — exclude self
   const otherMembers = members.filter((m) => m.user_id !== user?.id);
 
   return (
     <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-border bg-card">
       {/* Workspace header */}
-      <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
-        <button className="flex items-center gap-1.5 text-sm font-bold text-foreground truncate">
-          {workspace?.name || "Workspace"}
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-        </button>
-        <div className="flex items-center gap-0.5">
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            className="text-muted-foreground hover:text-foreground"
-            asChild
-          >
-            <Link href="/settings">
-              <Settings className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
+      <div className="border-b border-border px-3 py-2.5">
+        <div className="flex items-center justify-between">
+          <button className="flex items-center gap-1.5 text-sm font-bold text-foreground truncate">
+            {workspace?.name || "Workspace"}
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
+          <div className="flex items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              className="text-muted-foreground hover:text-foreground"
+              asChild
+            >
+              <Link href="/settings">
+                <Settings className="h-3.5 w-3.5" />
+              </Link>
+            </Button>
+          </div>
         </div>
+        {workspace?.slug && (
+          <button
+            onClick={copySubdomainUrl}
+            className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Globe className="h-3 w-3" />
+            <span className="truncate">{workspace.slug}.georgeholmes.io</span>
+            {copiedUrl ? (
+              <Check className="h-2.5 w-2.5 shrink-0" />
+            ) : (
+              <Copy className="h-2.5 w-2.5 shrink-0" />
+            )}
+          </button>
+        )}
       </div>
 
       {/* Quick actions */}
       <div className="px-2 pt-3 space-y-0.5">
         <Link
-          href={`/workspace/${workspaceId}`}
+          href={basePath}
           className={`flex items-center gap-2 rounded px-2 py-1.5 text-sm transition-colors ${
-            pathname === `/workspace/${workspaceId}`
+            pathname === basePath
               ? "bg-accent text-accent-foreground"
               : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
           }`}
@@ -197,9 +228,9 @@ export function WorkspaceSidebar({ workspaceId }: { workspaceId: string }) {
           {channels.map((channel) => (
             <Link
               key={channel.id}
-              href={`/workspace/${workspaceId}/channel/${channel.id}`}
+              href={`${basePath}/channel/${channel.id}`}
               className={`flex items-center gap-1.5 rounded px-2 py-1 text-sm transition-colors ${
-                pathname === `/workspace/${workspaceId}/channel/${channel.id}`
+                pathname === `${basePath}/channel/${channel.id}`
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
               }`}
@@ -213,9 +244,15 @@ export function WorkspaceSidebar({ workspaceId }: { workspaceId: string }) {
 
       {/* Direct Messages */}
       <div className="flex-1 overflow-y-auto px-2 pt-4 pb-2">
-        <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Direct messages
-        </p>
+        <div className="flex items-center justify-between px-2 mb-1">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Direct messages
+          </p>
+          <div className="flex items-center text-[10px] text-muted-foreground">
+            <Users className="h-3 w-3 mr-0.5" />
+            {members.length}
+          </div>
+        </div>
         {otherMembers.length === 0 ? (
           <p className="px-2 py-2 text-xs text-muted-foreground text-center">
             No other members yet
@@ -224,9 +261,9 @@ export function WorkspaceSidebar({ workspaceId }: { workspaceId: string }) {
           otherMembers.map((member) => (
             <Link
               key={member.user_id}
-              href={`/workspace/${workspaceId}/dm/${member.user_id}`}
+              href={`${basePath}/dm/${member.user_id}`}
               className={`flex items-center gap-2 rounded px-2 py-1 text-sm transition-colors ${
-                pathname === `/workspace/${workspaceId}/dm/${member.user_id}`
+                pathname === `${basePath}/dm/${member.user_id}`
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
               }`}

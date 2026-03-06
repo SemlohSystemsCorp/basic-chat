@@ -5,12 +5,13 @@ import { useParams } from "next/navigation";
 import { Send } from "lucide-react";
 import { createClient } from "~/lib/supabase/client";
 import { Button } from "~/components/ui/button";
+import { useWorkspaceId } from "~/lib/workspace-context";
 import type { DirectMessage, Profile } from "~/lib/types";
 
 export default function DMPage() {
   const params = useParams();
   const supabase = createClient();
-  const workspaceId = params.id as string;
+  const workspaceId = useWorkspaceId();
   const otherUserId = params.userId as string;
 
   const [messages, setMessages] = useState<(DirectMessage & { sender: Profile })[]>([]);
