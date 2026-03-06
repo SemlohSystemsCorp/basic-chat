@@ -16,6 +16,7 @@ import {
   MessageSquare,
   Send,
   X,
+  Circle,
 } from "lucide-react";
 import { createClient } from "~/lib/supabase/client";
 import { Button } from "~/components/ui/button";
@@ -141,6 +142,7 @@ export default function CallPage() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [userName, setUserName] = useState("");
+  const [recording, setRecording] = useState(false);
 
   // Chat state
   const [chatOpen, setChatOpen] = useState(false);
@@ -298,6 +300,17 @@ export default function CallPage() {
     const newState = !micOn;
     callRef.current.setLocalAudio(newState);
     setMicOn(newState);
+  }
+
+  async function toggleRecording() {
+    if (!callRef.current) return;
+    if (recording) {
+      await callRef.current.stopRecording();
+      setRecording(false);
+    } else {
+      await callRef.current.startRecording();
+      setRecording(true);
+    }
   }
 
   async function toggleScreenShare() {
@@ -530,6 +543,17 @@ export default function CallPage() {
             title={screenSharing ? "Stop sharing" : "Share screen"}
           >
             <Monitor className="h-5 w-5" />
+          </Button>
+
+          <Button
+            variant={recording ? "destructive" : "outline"}
+            size="icon"
+            onClick={toggleRecording}
+            title={recording ? "Stop recording" : "Record"}
+          >
+            <Circle
+              className={`h-5 w-5 ${recording ? "fill-current" : ""}`}
+            />
           </Button>
 
           <div className="mx-2 h-8 w-px bg-border" />

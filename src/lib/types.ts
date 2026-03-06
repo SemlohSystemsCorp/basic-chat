@@ -16,6 +16,7 @@ export type Meeting = {
   host_id: string;
   started_at: string;
   ended_at: string | null;
+  recording_enabled: boolean;
   created_at: string;
   host?: Profile;
 };

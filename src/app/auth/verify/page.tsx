@@ -83,7 +83,13 @@ function VerifyForm() {
       if (storedPassword) {
         sessionStorage.removeItem("verify_password");
         await supabase.auth.signInWithPassword({ email, password: storedPassword });
-        router.push("/");
+        const checkoutPlan = sessionStorage.getItem("checkoutPlan");
+        if (checkoutPlan) {
+          sessionStorage.removeItem("checkoutPlan");
+          router.push(`/checkout?plan=${checkoutPlan}`);
+        } else {
+          router.push("/");
+        }
         router.refresh();
         return;
       }

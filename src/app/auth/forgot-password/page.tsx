@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -16,10 +15,10 @@ import {
 } from "~/components/ui/card";
 
 export default function ForgotPasswordPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sent, setSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,11 +40,56 @@ export default function ForgotPasswordPage() {
         return;
       }
 
-      router.push(`/auth/reset-password?email=${encodeURIComponent(email)}`);
+      setSent(true);
     } catch {
       setError("Something went wrong");
       setLoading(false);
     }
+  }
+
+  if (sent) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl tracking-tight">
+              Check your email
+            </CardTitle>
+            <CardDescription>
+              We sent a password reset link to <strong>{email}</strong>. Click
+              the link in the email to set a new password.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              The link expires in 30 minutes. If you don&apos;t see the email,
+              check your spam folder.
+            </p>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                setSent(false);
+                setLoading(false);
+              }}
+            >
+              Send again
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              Remember your password?{" "}
+              <Link
+                href="/auth/login"
+                className="font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                Log in
+              </Link>
+            </p>
+          </CardFooter>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -56,7 +100,7 @@ export default function ForgotPasswordPage() {
             Reset password
           </CardTitle>
           <CardDescription>
-            Enter your email and we&apos;ll send you a 6-digit code
+            Enter your email and we&apos;ll send you a reset link
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -80,7 +124,7 @@ export default function ForgotPasswordPage() {
           </CardContent>
           <CardFooter className="mt-4 flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Sending..." : "Send reset code"}
+              {loading ? "Sending..." : "Send reset link"}
             </Button>
             <p className="text-sm text-muted-foreground">
               Remember your password?{" "}

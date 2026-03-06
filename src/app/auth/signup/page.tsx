@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import Link from "next/link";
 import { createClient } from "~/lib/supabase/client";
 import { Button } from "~/components/ui/button";
@@ -16,8 +17,10 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const checkoutPlan = searchParams.get("checkoutPlan");
   const supabase = createClient();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -62,6 +65,9 @@ export default function SignupPage() {
 
     // Store password temporarily for auto-login after verification
     sessionStorage.setItem("verify_password", password);
+    if (checkoutPlan) {
+      sessionStorage.setItem("checkoutPlan", checkoutPlan);
+    }
     router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
   }
 
@@ -147,5 +153,13 @@ export default function SignupPage() {
         </form>
       </Card>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
   );
 }

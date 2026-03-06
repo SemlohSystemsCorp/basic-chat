@@ -3,11 +3,11 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function POST(request: Request) {
   try {
-    const { email, code, password } = await request.json();
+    const { email, token, password } = await request.json();
 
-    if (!email || !code || !password) {
+    if (!email || !token || !password) {
       return NextResponse.json(
-        { error: "Email, code, and password are required" },
+        { error: "Email, token, and password are required" },
         { status: 400 }
       );
     }
@@ -24,26 +24,26 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Look up the code
+    // Look up the token
     const { data: verification } = await supabaseAdmin
       .from("verification_codes")
       .select("*")
       .eq("email", email)
-      .eq("code", code)
+      .eq("code", token)
       .eq("type", "password_reset")
       .eq("used", false)
       .single();
 
     if (!verification) {
       return NextResponse.json(
-        { error: "Invalid code. Please try again." },
+        { error: "Invalid or expired reset link. Please request a new one." },
         { status: 400 }
       );
     }
 
     if (new Date(verification.expires_at) < new Date()) {
       return NextResponse.json(
-        { error: "Code has expired. Please request a new one." },
+        { error: "This reset link has expired. Please request a new one." },
         { status: 400 }
       );
     }
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Mark code as used
+    // Mark token as used
     await supabaseAdmin
       .from("verification_codes")
       .update({ used: true })

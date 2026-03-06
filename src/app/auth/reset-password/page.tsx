@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -18,53 +19,25 @@ import {
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const token = searchParams.get("token") || "";
   const email = searchParams.get("email") || "";
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
+
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [resending, setResending] = useState(false);
-  const [resent, setResent] = useState(false);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
-
-  function handleChange(index: number, value: string) {
-    if (!/^\d*$/.test(value)) return;
-    const newCode = [...code];
-    newCode[index] = value.slice(-1);
-    setCode(newCode);
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  }
-
-  function handleKeyDown(index: number, e: React.KeyboardEvent) {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  }
-
-  function handlePaste(e: React.ClipboardEvent) {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-    if (pasted.length === 6) {
-      setCode(pasted.split(""));
-      inputRefs.current[5]?.focus();
-    }
-  }
-
-  if (!email) {
+  if (!token || !email) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <Card className="w-full max-w-md">
-          <CardContent className="py-8 text-center">
+          <CardContent className="py-8 text-center space-y-4">
             <p className="text-sm text-destructive">
-              No email provided. Please request a password reset first.
+              Invalid reset link. Please request a new password reset.
             </p>
+            <Button variant="outline" asChild>
+              <Link href="/auth/forgot-password">Request reset</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -74,12 +47,6 @@ function ResetPasswordForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-
-    const fullCode = code.join("");
-    if (fullCode.length !== 6) {
-      setError("Please enter the full 6-digit code.");
-      return;
-    }
 
     if (password !== confirm) {
       setError("Passwords do not match.");
@@ -97,7 +64,7 @@ function ResetPasswordForm() {
       const res = await fetch("/api/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code: fullCode, password }),
+        body: JSON.stringify({ email, token, password }),
       });
 
       const data = await res.json();
@@ -115,23 +82,6 @@ function ResetPasswordForm() {
     }
   }
 
-  async function resendCode() {
-    setResending(true);
-    setResent(false);
-    try {
-      await fetch("/api/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      setResent(true);
-      setTimeout(() => setResent(false), 3000);
-    } catch {
-      setError("Failed to resend code");
-    }
-    setResending(false);
-  }
-
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <Card className="w-full max-w-md">
@@ -140,7 +90,7 @@ function ResetPasswordForm() {
             Set new password
           </CardTitle>
           <CardDescription>
-            Enter the code sent to {email} and your new password
+            Enter a new password for {email}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -150,24 +100,6 @@ function ResetPasswordForm() {
                 {error}
               </div>
             )}
-            <div>
-              <Label className="mb-2 block">Verification code</Label>
-              <div className="flex justify-center gap-2" onPaste={handlePaste}>
-                {code.map((digit, i) => (
-                  <input
-                    key={i}
-                    ref={(el) => { inputRefs.current[i] = el; }}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleChange(i, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(i, e)}
-                    className="h-12 w-10 rounded border border-border bg-card text-center text-lg font-bold outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
-                  />
-                ))}
-              </div>
-            </div>
             <div className="space-y-2">
               <Label htmlFor="password">New password</Label>
               <Input
@@ -175,6 +107,7 @@ function ResetPasswordForm() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 6 characters"
                 required
                 minLength={6}
               />
@@ -186,6 +119,7 @@ function ResetPasswordForm() {
                 type="password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
+                placeholder="Confirm your new password"
                 required
                 minLength={6}
               />
@@ -195,14 +129,14 @@ function ResetPasswordForm() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Updating..." : "Update password"}
             </Button>
-            <button
-              type="button"
-              onClick={resendCode}
-              disabled={resending}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              {resent ? "Code sent!" : resending ? "Sending..." : "Resend code"}
-            </button>
+            <p className="text-sm text-muted-foreground">
+              <Link
+                href="/auth/login"
+                className="font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                Back to login
+              </Link>
+            </p>
           </CardFooter>
         </form>
       </Card>

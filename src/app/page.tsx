@@ -98,6 +98,56 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing preview */}
+      <section className="border-t border-border py-20">
+        <div className="mx-auto max-w-5xl px-6">
+          <h2 className="text-center text-2xl font-bold tracking-tight text-foreground mb-4">
+            Simple pricing
+          </h2>
+          <p className="text-center text-muted-foreground mb-12">
+            Start free, upgrade when you need more.
+          </p>
+          <div className="grid gap-6 sm:grid-cols-3">
+            {[
+              { name: "Free", price: "$0", period: "forever", cta: "Get started", href: "/auth/signup", features: ["1-hour meetings", "Up to 4 participants", "Screen sharing", "In-call chat"] },
+              { name: "Pro", price: "$12", period: "/month", cta: "Upgrade to Pro", href: "/auth/signup?checkoutPlan=pro", popular: true, features: ["Unlimited duration", "Up to 25 participants", "Meeting recordings", "Custom branding"] },
+              { name: "Team", price: "$30", period: "/month", cta: "Upgrade to Team", href: "/auth/signup?checkoutPlan=team", features: ["Everything in Pro", "Up to 100 participants", "Admin dashboard", "Priority support"] },
+            ].map((plan) => (
+              <div key={plan.name} className={`relative rounded border bg-card p-6 ${plan.popular ? "border-primary" : "border-border"}`}>
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-xs font-medium text-primary-foreground">
+                    Most popular
+                  </div>
+                )}
+                <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
+                <div className="mt-2 flex items-baseline gap-1">
+                  <span className="text-3xl font-bold text-foreground">{plan.price}</span>
+                  <span className="text-sm text-muted-foreground">{plan.period}</span>
+                </div>
+                <ul className="mt-6 space-y-2">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-6">
+                  <Button className="w-full" variant={plan.popular ? "default" : "outline"} asChild>
+                    <Link href={plan.href}>{plan.cta}</Link>
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-sm text-muted-foreground mt-8">
+            <Link href="/pricing" className="text-primary hover:text-primary/80 transition-colors">
+              View full plan comparison
+            </Link>
+          </p>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20">
         <div className="mx-auto max-w-5xl px-6 text-center">
@@ -115,10 +165,15 @@ function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-border py-8">
-        <div className="mx-auto max-w-5xl px-6 text-center">
+        <div className="mx-auto max-w-5xl px-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
           <p className="text-sm text-muted-foreground">
             Built by George Holmes
           </p>
+          <div className="flex gap-6 text-sm text-muted-foreground">
+            <Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+          </div>
         </div>
       </footer>
     </div>
