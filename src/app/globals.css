@@ -1,0 +1,145 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --shadow-card: none;
+  --shadow-card-hover: none;
+  --shadow-elevated: none;
+  --shadow-button: none;
+  --shadow-button-hover: none;
+  --shadow-input: none;
+}
+
+:root {
+  --radius: 0.25rem;
+  --background: #f6f9fc;
+  --foreground: #0a2540;
+  --card: #ffffff;
+  --card-foreground: #0a2540;
+  --popover: #ffffff;
+  --popover-foreground: #0a2540;
+  --primary: #635bff;
+  --primary-foreground: #ffffff;
+  --secondary: #edf0f4;
+  --secondary-foreground: #0a2540;
+  --muted: #f0f3f7;
+  --muted-foreground: #596780;
+  --accent: #f0f0ff;
+  --accent-foreground: #635bff;
+  --destructive: #df1b41;
+  --success: #00d48c;
+  --success-foreground: #ffffff;
+  --border: #e3e8ee;
+  --input: #e3e8ee;
+  --ring: #635bff;
+  --chart-1: #635bff;
+  --chart-2: #00d48c;
+  --chart-3: #0a2540;
+  --chart-4: #596780;
+  --chart-5: #a3acb9;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0a2540;
+  --sidebar-primary: #635bff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0f0ff;
+  --sidebar-accent-foreground: #635bff;
+  --sidebar-border: #e3e8ee;
+  --sidebar-ring: #635bff;
+}
+
+.dark {
+  --background: #0a1628;
+  --foreground: #e3e8ee;
+  --card: #0f2137;
+  --card-foreground: #e3e8ee;
+  --popover: #0f2137;
+  --popover-foreground: #e3e8ee;
+  --primary: #7a73ff;
+  --primary-foreground: #ffffff;
+  --secondary: #1a3050;
+  --secondary-foreground: #e3e8ee;
+  --muted: #1a3050;
+  --muted-foreground: #8898aa;
+  --accent: #1a1a40;
+  --accent-foreground: #7a73ff;
+  --destructive: #f45b69;
+  --success: #00d48c;
+  --success-foreground: #0a2540;
+  --border: #1e3a5f;
+  --input: #1e3a5f;
+  --ring: #7a73ff;
+  --chart-1: #7a73ff;
+  --chart-2: #00d48c;
+  --chart-3: #e3e8ee;
+  --chart-4: #8898aa;
+  --chart-5: #596780;
+  --sidebar: #0f2137;
+  --sidebar-foreground: #e3e8ee;
+  --sidebar-primary: #7a73ff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1a1a40;
+  --sidebar-accent-foreground: #7a73ff;
+  --sidebar-border: #1e3a5f;
+  --sidebar-ring: #7a73ff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.7;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+}
