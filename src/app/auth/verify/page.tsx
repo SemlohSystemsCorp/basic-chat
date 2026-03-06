@@ -88,7 +88,7 @@ function VerifyForm() {
           sessionStorage.removeItem("checkoutPlan");
           router.push(`/checkout?plan=${checkoutPlan}`);
         } else {
-          router.push("/");
+          router.push("/workspace/create");
         }
         router.refresh();
         return;

@@ -358,7 +358,7 @@ export default function CallPage() {
   // Pre-join screen
   if (!joined) {
     return (
-      <div className="flex h-full items-center justify-center">
+      <div className="flex h-screen items-center justify-center">
         <div className="w-full max-w-md space-y-6 px-4">
           <div className="text-center">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -381,7 +381,7 @@ export default function CallPage() {
               placeholder="Your name"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              className="flex h-10 w-full rounded border border-border bg-card px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary/30 transition-colors"
+              className="flex h-10 w-full rounded border border-border bg-card px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary/30 transition-colors text-center"
             />
             <Button
               onClick={joinCall}

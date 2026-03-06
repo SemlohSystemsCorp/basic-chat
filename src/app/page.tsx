@@ -395,14 +395,32 @@ function Dashboard() {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const supabase = createClient();
   const [authed, setAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setAuthed(!!user);
-    });
-  }, [supabase]);
+    async function checkAuth() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setAuthed(false);
+        return;
+      }
+      setAuthed(true);
+
+      // Check if user has a workspace — redirect to it
+      const { data: memberships } = await supabase
+        .from("workspace_members")
+        .select("workspace_id")
+        .eq("user_id", user.id)
+        .limit(1);
+
+      if (memberships && memberships.length > 0) {
+        router.push(`/workspace/${memberships[0].workspace_id}`);
+      }
+    }
+    checkAuth();
+  }, [supabase, router]);
 
   if (authed === null) {
     return (

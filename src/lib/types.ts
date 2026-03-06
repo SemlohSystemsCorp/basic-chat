@@ -21,6 +21,55 @@ export type Meeting = {
   host?: Profile;
 };
 
+export type Workspace = {
+  id: number;
+  name: string;
+  slug: string;
+  icon_url: string | null;
+  owner_id: string;
+  created_at: string;
+};
+
+export type WorkspaceMember = {
+  id: number;
+  workspace_id: number;
+  user_id: string;
+  role: "owner" | "admin" | "member";
+  joined_at: string;
+  profile?: Profile;
+};
+
+export type Channel = {
+  id: number;
+  workspace_id: number;
+  name: string;
+  description: string | null;
+  is_default: boolean;
+  created_by: string | null;
+  created_at: string;
+};
+
+export type ChannelMessage = {
+  id: number;
+  channel_id: number;
+  user_id: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  sender?: Profile;
+};
+
+export type DirectMessage = {
+  id: number;
+  workspace_id: number;
+  sender_id: string;
+  receiver_id: string;
+  content: string;
+  created_at: string;
+  sender?: Profile;
+  receiver?: Profile;
+};
+
 export type Subscription = {
   id: number;
   user_id: string;
