@@ -13,11 +13,12 @@ drop trigger if exists update_boxes_updated_at on public.boxes;
 drop trigger if exists update_profiles_updated_at on public.profiles;
 drop trigger if exists on_auth_user_created on auth.users;
 
-drop function if exists public.cleanup_expired_verification_codes();
-drop function if exists public.update_updated_at();
-drop function if exists public.handle_new_user();
-drop function if exists public.get_user_box_ids(uuid);
-drop function if exists public.get_user_admin_box_ids(uuid);
+drop function if exists public.cleanup_expired_verification_codes() cascade;
+drop function if exists public.update_updated_at() cascade;
+drop function if exists public.handle_new_user() cascade;
+drop function if exists public.get_user_box_ids(uuid) cascade;
+drop function if exists public.get_user_admin_box_ids(uuid) cascade;
+drop function if exists public.generate_box_slug() cascade;
 
 drop table if exists public.verification_codes cascade;
 drop table if exists public.invites cascade;
