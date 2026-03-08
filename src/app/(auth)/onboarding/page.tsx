@@ -216,9 +216,9 @@ function OnboardingContent() {
 
   if (loading) {
     return (
-      <div className={styles.page}>
-        <div className={styles.container}>
-          <div className={styles.card}>
+      <div className="auth-page">
+        <div className="auth-container">
+          <div className="auth-card">
             <div className={styles.loadingState}>
               <div className="spinner" />
               <p className={styles.loadingText}>Checking for invitations...</p>
@@ -230,19 +230,9 @@ function OnboardingContent() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.container}>
-        <div className={styles.logo}>Chatterbox</div>
-        <h1 className={styles.title}>
-          {pendingInvites.length > 0 ? 'You have invitations' : 'Join or create a Box'}
-        </h1>
-        <p className={styles.subtitle}>
-          {pendingInvites.length > 0
-            ? 'Pick a workspace to join, or start your own.'
-            : 'Enter an invite code to join a team, or create your own workspace.'}
-        </p>
-
-        {/* Pending invites */}
+    <div className="auth-page">
+      <div className="auth-container">
+        {/* Pending invites (shown above the card) */}
         {pendingInvites.length > 0 && (
           <div className={styles.inviteList}>
             {pendingInvites.map((invite) => (
@@ -266,11 +256,21 @@ function OnboardingContent() {
               </div>
             ))}
 
-            <div className={styles.divider}>or</div>
+            <div className="auth-divider">or</div>
           </div>
         )}
 
-        <div className={styles.card}>
+        <div className="auth-card">
+          <div className="auth-logo" style={{ textAlign: 'center' }}>Chatterbox</div>
+          <h1 className="auth-title" style={{ textAlign: 'center' }}>
+            {pendingInvites.length > 0 ? 'You have invitations' : 'Join or create a Box'}
+          </h1>
+          <p className="auth-subtitle" style={{ textAlign: 'center' }}>
+            {pendingInvites.length > 0
+              ? 'Pick a workspace to join, or start your own.'
+              : 'Enter an invite code to join a team, or create your own workspace.'}
+          </p>
+
           {error && <div className="alert alert-error">{error}</div>}
 
           {/* Tabs */}
@@ -389,10 +389,10 @@ export default function OnboardingPage() {
   return (
     <Suspense
       fallback={
-        <div className={styles.page}>
-          <div className={styles.container}>
-            <div className={styles.card}>
-              <div className={styles.loadingState}>
+        <div className="auth-page">
+          <div className="auth-container">
+            <div className="auth-card">
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '40px 0' }}>
                 <div className="spinner" />
               </div>
             </div>

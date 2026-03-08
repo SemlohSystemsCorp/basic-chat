@@ -1,51 +1,6 @@
 /* ============================================
-   Onboarding Page
+   Onboarding Page (extras beyond global auth styles)
    ============================================ */
-
-.page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  background: var(--color-bg);
-}
-
-.container {
-  width: 100%;
-  max-width: 480px;
-}
-
-.logo {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-heading);
-  text-align: center;
-  margin-bottom: 6px;
-}
-
-.title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-heading);
-  text-align: center;
-  margin-bottom: 2px;
-}
-
-.subtitle {
-  font-size: 14px;
-  color: var(--color-muted);
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-md);
-  padding: 24px 28px;
-}
 
 .loadingState {
   display: flex;
@@ -60,7 +15,7 @@
   color: var(--color-muted);
 }
 
-/* ── Invite Card ── */
+/* ── Invite Cards ── */
 .inviteList {
   display: flex;
   flex-direction: column;
@@ -73,9 +28,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: var(--color-bg);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
 }
 
 .inviteInfo {
@@ -149,22 +105,4 @@
 .slugPreview span {
   color: var(--color-primary);
   font-weight: 500;
-}
-
-/* ── Divider ── */
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 20px 0;
-  color: var(--color-muted);
-  font-size: 13px;
-}
-
-.divider::before,
-.divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--color-border);
 }
