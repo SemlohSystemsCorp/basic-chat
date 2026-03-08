@@ -75,13 +75,13 @@ export default function SignupPage() {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <div className="auth-logo" style={{ textAlign: 'center' }}>Chatterbox</div>
-        <h1 className="auth-title" style={{ textAlign: 'center' }}>Create your account</h1>
-        <p className="auth-subtitle" style={{ textAlign: 'center' }}>
-          Get started free. No credit card required.
-        </p>
-
         <div className="auth-card">
+          <div className="auth-logo" style={{ textAlign: 'center' }}>Chatterbox</div>
+          <h1 className="auth-title" style={{ textAlign: 'center' }}>Create your account</h1>
+          <p className="auth-subtitle" style={{ textAlign: 'center' }}>
+            Get started free. No credit card required.
+          </p>
+
           {error && <div className="alert alert-error">{error}</div>}
 
           <form onSubmit={handleSubmit}>

@@ -67,11 +67,7 @@ create table public.boxes (
 
 alter table public.boxes enable row level security;
 
-create policy "Box members can view their boxes"
-  on public.boxes for select
-  using (
-    id in (select box_id from public.box_members where user_id = auth.uid())
-  );
+-- NOTE: boxes SELECT policy is created AFTER box_members table exists (see below)
 
 create policy "Box owner can update box"
   on public.boxes for update
@@ -82,7 +78,7 @@ create policy "Authenticated users can create boxes"
   with check (auth.uid() = owner_id);
 
 -- ============================================
--- BOX MEMBERS
+-- BOX MEMBERS (must be created before boxes RLS that references it)
 -- ============================================
 create table public.box_members (
   id uuid default uuid_generate_v4() primary key,
@@ -92,6 +88,13 @@ create table public.box_members (
   joined_at timestamptz default now() not null,
   unique(box_id, user_id)
 );
+
+-- NOW create the boxes SELECT policy (box_members exists)
+create policy "Box members can view their boxes"
+  on public.boxes for select
+  using (
+    id in (select box_id from public.box_members where user_id = auth.uid())
+  );
 
 alter table public.box_members enable row level security;
 
