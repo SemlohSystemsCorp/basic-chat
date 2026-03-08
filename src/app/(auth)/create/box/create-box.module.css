@@ -1,0 +1,74 @@
+.page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding: 80px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* ── Code Section ── */
+.codeSection {
+  margin-bottom: 4px;
+}
+
+.codeBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  margin-top: 6px;
+}
+
+.code {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--color-heading);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* ── Invite Form ── */
+.inviteForm {
+  display: flex;
+  gap: 8px;
+}
+
+.inviteForm input {
+  flex: 1;
+}
+
+.errorText {
+  font-size: 13px;
+  color: var(--color-error);
+  margin-top: 6px;
+}
+
+/* ── Invited List ── */
+.invitedList {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.invitedItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--color-body);
+}

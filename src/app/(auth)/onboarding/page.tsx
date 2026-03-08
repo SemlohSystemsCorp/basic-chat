@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import styles from './onboarding.module.css';
 
@@ -24,11 +25,6 @@ function OnboardingContent() {
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
-  const [tab, setTab] = useState<'code' | 'create'>('code');
-  const [inviteCode, setInviteCode] = useState(inviteParam || '');
-  const [boxName, setBoxName] = useState('');
-  const [boxSlug, setBoxSlug] = useState('');
-  const [error, setError] = useState('');
 
   const supabase = createClient();
 
@@ -52,7 +48,13 @@ function OnboardingContent() {
       .limit(1);
 
     if (memberships && memberships.length > 0) {
-      router.push(`/box/${memberships[0].box_id}`);
+      router.push('/dashboard');
+      return;
+    }
+
+    // If there's an invite code in the URL, go straight to join page
+    if (inviteParam) {
+      router.push(`/onboarding/join?invite=${inviteParam}`);
       return;
     }
 
@@ -64,7 +66,6 @@ function OnboardingContent() {
       .eq('status', 'pending');
 
     if (invites && invites.length > 0) {
-      // Auto-join if there's exactly one invite
       if (invites.length === 1) {
         await joinBox(invites[0].box_id, invites[0].id);
         return;
@@ -72,17 +73,11 @@ function OnboardingContent() {
       setPendingInvites(invites as unknown as PendingInvite[]);
     }
 
-    // If there's an invite code in the URL, pre-fill and auto-try
-    if (inviteParam) {
-      setTab('code');
-    }
-
     setLoading(false);
   }
 
   async function joinBox(boxId: string, inviteId?: string) {
     setJoining(true);
-    setError('');
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -92,12 +87,10 @@ function OnboardingContent() {
       .insert({ box_id: boxId, user_id: user.id, role: 'member' });
 
     if (joinError) {
-      setError(joinError.message);
       setJoining(false);
       return;
     }
 
-    // Mark invite as accepted
     if (inviteId) {
       await supabase
         .from('invites')
@@ -105,123 +98,17 @@ function OnboardingContent() {
         .eq('id', inviteId);
     }
 
-    router.push(`/box/${boxId}`);
-  }
-
-  async function handleJoinWithCode(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    setJoining(true);
-
-    const code = inviteCode.trim();
-    if (!code) {
-      setError('Please enter an invite code.');
-      setJoining(false);
-      return;
-    }
-
-    // Try finding a box with this invite code
-    const { data: box } = await supabase
-      .from('boxes')
-      .select('id')
-      .eq('invite_code', code)
-      .single();
-
-    if (box) {
-      await joinBox(box.id);
-      return;
-    }
-
-    // Try finding an invite with this code
-    const { data: invite } = await supabase
-      .from('invites')
-      .select('id, box_id')
-      .eq('code', code)
-      .eq('status', 'pending')
-      .single();
-
-    if (invite) {
-      await joinBox(invite.box_id, invite.id);
-      return;
-    }
-
-    setError('Invalid invite code. Please check and try again.');
-    setJoining(false);
-  }
-
-  async function handleCreateBox(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    setJoining(true);
-
-    const name = boxName.trim();
-    const slug = boxSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-
-    if (!name) {
-      setError('Box name is required.');
-      setJoining(false);
-      return;
-    }
-
-    if (!slug || slug.length < 3) {
-      setError('URL must be at least 3 characters.');
-      setJoining(false);
-      return;
-    }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    // Create the box
-    const { data: box, error: createError } = await supabase
-      .from('boxes')
-      .insert({ name, slug, owner_id: user.id })
-      .select('id')
-      .single();
-
-    if (createError) {
-      if (createError.message.includes('duplicate') || createError.message.includes('unique')) {
-        setError('That URL is already taken. Try a different one.');
-      } else {
-        setError(createError.message);
-      }
-      setJoining(false);
-      return;
-    }
-
-    // Add owner as a member
-    await supabase
-      .from('box_members')
-      .insert({ box_id: box.id, user_id: user.id, role: 'owner' });
-
-    // Create a default #general channel
-    await supabase
-      .from('channels')
-      .insert({ box_id: box.id, name: 'general', description: 'General discussion', created_by: user.id });
-
-    router.push(`/box/${box.id}`);
-  }
-
-  function handleNameChange(value: string) {
-    setBoxName(value);
-    // Auto-generate slug from name
-    const auto = value
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .slice(0, 32);
-    setBoxSlug(auto);
+    router.push('/dashboard');
   }
 
   if (loading) {
     return (
-      <div className="auth-page">
-        <div className="auth-container">
+      <div className={styles.page}>
+        <div className={styles.container}>
           <div className="auth-card">
             <div className={styles.loadingState}>
               <div className="spinner" />
-              <p className={styles.loadingText}>Checking for invitations...</p>
+              <p className={styles.loadingText}>Setting things up...</p>
             </div>
           </div>
         </div>
@@ -232,153 +119,77 @@ function OnboardingContent() {
   return (
     <div className={styles.page}>
       <div className={styles.container}>
-        {/* Pending invites (shown above the card) */}
-        {pendingInvites.length > 0 && (
-          <div className={styles.inviteList}>
-            {pendingInvites.map((invite) => (
-              <div key={invite.id} className={styles.inviteItem}>
-                <div className={styles.inviteInfo}>
-                  <div className={styles.inviteIcon}>
-                    {invite.box?.name?.charAt(0)?.toUpperCase() || 'B'}
-                  </div>
-                  <div>
-                    <div className={styles.inviteName}>{invite.box?.name}</div>
-                    <div className={styles.inviteMeta}>{invite.box?.slug}.chatterbox.io</div>
-                  </div>
-                </div>
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => joinBox(invite.box_id, invite.id)}
-                  disabled={joining}
-                >
-                  {joining ? 'Joining...' : 'Join'}
-                </button>
-              </div>
-            ))}
+        <div className={styles.header}>
+          <div className="auth-logo" style={{ textAlign: 'center' }}>Chatterbox</div>
+          <h1 className="auth-title" style={{ textAlign: 'center', fontSize: 26 }}>
+            Welcome to Chatterbox
+          </h1>
+          <p className="auth-subtitle" style={{ textAlign: 'center', marginBottom: 0 }}>
+            Get started by joining an existing workspace or creating your own.
+          </p>
+        </div>
 
-            <div className="auth-divider">or</div>
+        {/* Pending invites */}
+        {pendingInvites.length > 0 && (
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Pending invitations</h3>
+            <div className={styles.inviteList}>
+              {pendingInvites.map((invite) => (
+                <div key={invite.id} className={styles.inviteItem}>
+                  <div className={styles.inviteInfo}>
+                    <div className={styles.inviteIcon}>
+                      {invite.box?.name?.charAt(0)?.toUpperCase() || 'B'}
+                    </div>
+                    <div>
+                      <div className={styles.inviteName}>{invite.box?.name}</div>
+                      <div className={styles.inviteMeta}>{invite.box?.slug}.chatterbox.io</div>
+                    </div>
+                  </div>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => joinBox(invite.box_id, invite.id)}
+                    disabled={joining}
+                  >
+                    {joining ? 'Joining...' : 'Join'}
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="auth-divider">or get started another way</div>
           </div>
         )}
 
-        <div className="auth-card">
-          <div className="auth-logo" style={{ textAlign: 'center' }}>Chatterbox</div>
-          <h1 className="auth-title" style={{ textAlign: 'center' }}>
-            {pendingInvites.length > 0 ? 'You have invitations' : 'Join or create a Box'}
-          </h1>
-          <p className="auth-subtitle" style={{ textAlign: 'center' }}>
-            {pendingInvites.length > 0
-              ? 'Pick a workspace to join, or start your own.'
-              : 'Enter an invite code to join a team, or create your own workspace.'}
-          </p>
+        {/* Two option cards */}
+        <div className={styles.optionGrid}>
+          <Link href="/onboarding/join" className={styles.optionCard}>
+            <div className={styles.optionIcon}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+            </div>
+            <h3 className={styles.optionTitle}>Join a Box</h3>
+            <p className={styles.optionDesc}>
+              Have an invite code? Enter it to join your team&apos;s workspace.
+            </p>
+            <span className={styles.optionAction}>Enter invite code &rarr;</span>
+          </Link>
 
-          {error && <div className="alert alert-error">{error}</div>}
-
-          {/* Tabs */}
-          <div className={styles.tabs}>
-            <button
-              className={`${styles.tab} ${tab === 'code' ? styles.tabActive : ''}`}
-              onClick={() => { setTab('code'); setError(''); }}
-            >
-              Join with code
-            </button>
-            <button
-              className={`${styles.tab} ${tab === 'create' ? styles.tabActive : ''}`}
-              onClick={() => { setTab('create'); setError(''); }}
-            >
-              Create a Box
-            </button>
-          </div>
-
-          {/* Join with code */}
-          {tab === 'code' && (
-            <form onSubmit={handleJoinWithCode}>
-              <div className="field">
-                <label className="label" htmlFor="inviteCode">
-                  Invite code
-                </label>
-                <input
-                  id="inviteCode"
-                  type="text"
-                  className="input"
-                  placeholder="e.g. a1b2c3d4"
-                  value={inviteCode}
-                  onChange={(e) => setInviteCode(e.target.value)}
-                  required
-                  autoFocus
-                />
-                <p className="field-hint">
-                  Ask your team admin for the invite code.
-                </p>
-              </div>
-              <button
-                type="submit"
-                className="btn btn-primary btn-full"
-                disabled={joining}
-              >
-                {joining ? (
-                  <>
-                    <span className="spinner spinner-sm" /> Joining...
-                  </>
-                ) : (
-                  'Join Box'
-                )}
-              </button>
-            </form>
-          )}
-
-          {/* Create a box */}
-          {tab === 'create' && (
-            <form onSubmit={handleCreateBox}>
-              <div className="field">
-                <label className="label" htmlFor="boxName">
-                  Box name
-                </label>
-                <input
-                  id="boxName"
-                  type="text"
-                  className="input"
-                  placeholder="My Company"
-                  value={boxName}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  required
-                  autoFocus
-                />
-              </div>
-              <div className="field">
-                <label className="label" htmlFor="boxSlug">
-                  URL
-                </label>
-                <input
-                  id="boxSlug"
-                  type="text"
-                  className="input"
-                  placeholder="my-company"
-                  value={boxSlug}
-                  onChange={(e) => setBoxSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                  required
-                  minLength={3}
-                />
-                {boxSlug && (
-                  <p className={styles.slugPreview}>
-                    Your Box will be at <span>{boxSlug}.chatterbox.io</span>
-                  </p>
-                )}
-              </div>
-              <button
-                type="submit"
-                className="btn btn-primary btn-full"
-                disabled={joining}
-              >
-                {joining ? (
-                  <>
-                    <span className="spinner spinner-sm" /> Creating...
-                  </>
-                ) : (
-                  'Create Box'
-                )}
-              </button>
-            </form>
-          )}
+          <Link href="/create/box" className={styles.optionCard}>
+            <div className={styles.optionIcon}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </div>
+            <h3 className={styles.optionTitle}>Create a Box</h3>
+            <p className={styles.optionDesc}>
+              Start a new workspace for your team, project, or community.
+            </p>
+            <span className={styles.optionAction}>Set up your workspace &rarr;</span>
+          </Link>
         </div>
       </div>
     </div>
