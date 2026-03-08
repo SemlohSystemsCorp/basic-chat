@@ -230,8 +230,8 @@ function OnboardingContent() {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
+    <div className={styles.page}>
+      <div className={styles.container}>
         {/* Pending invites (shown above the card) */}
         {pendingInvites.length > 0 && (
           <div className={styles.inviteList}>
@@ -389,8 +389,8 @@ export default function OnboardingPage() {
   return (
     <Suspense
       fallback={
-        <div className="auth-page">
-          <div className="auth-container">
+        <div className={styles.page}>
+          <div className={styles.container}>
             <div className="auth-card">
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '40px 0' }}>
                 <div className="spinner" />
