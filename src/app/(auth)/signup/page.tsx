@@ -75,13 +75,13 @@ export default function SignupPage() {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-logo">Chatterbox</div>
-          <h1 className="auth-title">Create your account</h1>
-          <p className="auth-subtitle">
-            Get started free. No credit card required.
-          </p>
+        <div className="auth-logo" style={{ textAlign: 'center' }}>Chatterbox</div>
+        <h1 className="auth-title" style={{ textAlign: 'center' }}>Create your account</h1>
+        <p className="auth-subtitle" style={{ textAlign: 'center' }}>
+          Get started free. No credit card required.
+        </p>
 
+        <div className="auth-card">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <button
               type="button"
@@ -176,18 +176,18 @@ export default function SignupPage() {
               )}
             </button>
           </form>
-
-          <p style={{ fontSize: 12, color: 'var(--color-muted)', textAlign: 'center', marginTop: 16, lineHeight: 1.5 }}>
-            By creating an account you agree to the{' '}
-            <Link href="/terms" style={{ color: 'var(--color-body)', textDecoration: 'underline' }}>Terms of Service</Link>{' '}
-            and{' '}
-            <Link href="/privacy" style={{ color: 'var(--color-body)', textDecoration: 'underline' }}>Privacy Policy</Link>.
-          </p>
-
-          <p className="auth-footer">
-            Already have an account? <Link href="/login">Sign in</Link>
-          </p>
         </div>
+
+        <p style={{ fontSize: 12, color: 'var(--color-muted)', textAlign: 'center', marginTop: 16, lineHeight: 1.5 }}>
+          By creating an account you agree to the{' '}
+          <Link href="/terms" style={{ color: 'var(--color-body)', textDecoration: 'underline' }}>Terms of Service</Link>{' '}
+          and{' '}
+          <Link href="/privacy" style={{ color: 'var(--color-body)', textDecoration: 'underline' }}>Privacy Policy</Link>.
+        </p>
+
+        <p className="auth-footer">
+          Already have an account? <Link href="/login">Sign in</Link>
+        </p>
       </div>
     </div>
   );

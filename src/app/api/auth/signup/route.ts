@@ -14,23 +14,28 @@ export async function POST(request: NextRequest) {
 
     // Generate a 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 min
 
-    // Find the user profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('id')
+    // Invalidate any existing codes for this email
+    await supabase
+      .from('verification_codes')
+      .delete()
       .eq('email', email)
-      .single();
+      .is('used_at', null);
 
-    if (profile) {
-      // Store code in user metadata
-      await supabase.auth.admin.updateUserById(profile.id, {
-        user_metadata: {
-          verification_code: code,
-          verification_code_expires: expiresAt,
-        },
+    // Store the code in the database
+    const { error: insertError } = await supabase
+      .from('verification_codes')
+      .insert({
+        email,
+        code,
       });
+
+    if (insertError) {
+      console.error('Failed to store verification code:', insertError);
+      return NextResponse.json(
+        { error: 'Failed to generate verification code' },
+        { status: 500 }
+      );
     }
 
     await sendVerificationCode(email, code);

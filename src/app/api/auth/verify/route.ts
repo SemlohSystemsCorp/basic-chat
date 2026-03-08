@@ -14,44 +14,39 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createServiceClient();
 
-    // Find the user by email
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('id')
+    // Find the most recent unused code for this email
+    const { data: verificationCode, error: fetchError } = await supabase
+      .from('verification_codes')
+      .select('*')
       .eq('email', email)
+      .is('used_at', null)
+      .order('created_at', { ascending: false })
+      .limit(1)
       .single();
 
-    if (!profile) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-
-    // Get the user's metadata to check the code
-    const { data: userData } = await supabase.auth.admin.getUserById(
-      profile.id
-    );
-
-    if (!userData?.user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-
-    const storedCode = userData.user.user_metadata?.verification_code;
-    const expiresAt = userData.user.user_metadata?.verification_code_expires;
-
-    if (!storedCode || !expiresAt) {
+    if (fetchError || !verificationCode) {
       return NextResponse.json(
         { error: 'No verification code found. Please request a new one.' },
         { status: 400 }
       );
     }
 
+    // Check if max attempts exceeded
+    if (verificationCode.attempts >= verificationCode.max_attempts) {
+      return NextResponse.json(
+        { error: 'Too many attempts. Please request a new code.' },
+        { status: 429 }
+      );
+    }
+
+    // Increment attempts
+    await supabase
+      .from('verification_codes')
+      .update({ attempts: verificationCode.attempts + 1 })
+      .eq('id', verificationCode.id);
+
     // Check expiration
-    if (new Date(expiresAt) < new Date()) {
+    if (new Date(verificationCode.expires_at) < new Date()) {
       return NextResponse.json(
         { error: 'Code expired. Please request a new one.' },
         { status: 400 }
@@ -59,28 +54,39 @@ export async function POST(request: NextRequest) {
     }
 
     // Check code match
-    if (storedCode !== code) {
+    if (verificationCode.code !== code) {
       return NextResponse.json(
         { error: 'Invalid code. Please try again.' },
         { status: 400 }
       );
     }
 
-    // Mark email as verified and clear the code
-    await supabase.auth.admin.updateUserById(profile.id, {
-      email_confirm: true,
-      user_metadata: {
-        ...userData.user.user_metadata,
-        email_verified: true,
-        verification_code: null,
-        verification_code_expires: null,
-      },
-    });
-
+    // Mark code as used
     await supabase
+      .from('verification_codes')
+      .update({ used_at: new Date().toISOString() })
+      .eq('id', verificationCode.id);
+
+    // Find the user profile and mark as verified
+    const { data: profile } = await supabase
       .from('profiles')
-      .update({ email_verified: true })
-      .eq('id', profile.id);
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (profile) {
+      await supabase.auth.admin.updateUserById(profile.id, {
+        email_confirm: true,
+        user_metadata: {
+          email_verified: true,
+        },
+      });
+
+      await supabase
+        .from('profiles')
+        .update({ email_verified: true })
+        .eq('id', profile.id);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

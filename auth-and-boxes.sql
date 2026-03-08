@@ -260,6 +260,37 @@ create policy "Box admins can update invites"
   );
 
 -- ============================================
+-- VERIFICATION CODES
+-- ============================================
+create table public.verification_codes (
+  id uuid default uuid_generate_v4() primary key,
+  email text not null,
+  code text not null,
+  attempts int default 0,
+  max_attempts int default 5,
+  created_at timestamptz default now() not null,
+  expires_at timestamptz default (now() + interval '10 minutes') not null,
+  used_at timestamptz
+);
+
+alter table public.verification_codes enable row level security;
+
+-- Only service role should access this table (no user-facing policies)
+-- RLS is enabled but no policies = no direct access from client
+
+create index idx_verification_codes_email on public.verification_codes(email);
+create index idx_verification_codes_email_code on public.verification_codes(email, code);
+
+-- Auto-cleanup expired codes (run via pg_cron or manually)
+create or replace function public.cleanup_expired_verification_codes()
+returns void as $$
+begin
+  delete from public.verification_codes
+  where expires_at < now() - interval '1 hour';
+end;
+$$ language plpgsql security definer;
+
+-- ============================================
 -- TRIGGERS
 -- ============================================
 create or replace function public.update_updated_at()
