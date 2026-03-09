@@ -33,7 +33,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const publicPaths = ['/', '/signup', '/login', '/verify-email', '/auth/callback', '/onboarding', '/onboarding/join', '/create/box', '/forgot-password', '/unsupported-browser', '/unsupported-device', '/ip-banned', '/unavailable', '/terms', '/privacy', '/cookies'];
+  const publicPaths = ['/', '/signup', '/login', '/verify-email', '/auth/callback', '/onboarding', '/onboarding/join', '/create/box', '/forgot-password', '/unsupported-browser', '/unsupported-device', '/ip-banned', '/unavailable', '/terms', '/privacy', '/cookies', '/pricing', '/about', '/company', '/blog', '/newsroom', '/enterprise', '/for-startups', '/for-edu', '/for-nonprofits', '/migrate-from-slack', '/migrate-from-discord', '/migrate-from-microsoft-teams', '/integrations'];
   const isPublicPath = publicPaths.some(
     (path) => request.nextUrl.pathname === path
   );
