@@ -1,0 +1,60 @@
+COOKIE POLICY
+Last Updated: March 9, 2026
+1. WHAT ARE COOKIES?
+Cookies are small text files that are placed on your device (computer, smartphone, or tablet) when you visit the Chatterbox platform (the "Service"). They are widely used to make websites and web applications work more efficiently, securely, and provide a better user experience. This policy explains what cookies we use, why we use them, and how you can manage them.
+2. HOW WE USE COOKIES
+Semloh Systems uses cookies strictly for essential operational purposes. We do not use cookies for advertising, third-party tracking, behavioral profiling, or selling data to marketers.
+Our cookies fall into the following categories:
+Strictly Necessary Cookies (Essential):
+Purpose: These cookies are required for the Service to function. They enable core features such as user authentication, session management, security verification, and maintaining your login state as you navigate between Clusters, Boxes, and Chatrooms.
+Examples: session_id, auth_token, csrf_token.
+Consequence of Disabling: If you disable these cookies, you will not be able to log in, send messages, or access protected parts of the Service. The application will cease to function.
+Preference Cookies (Functional):
+Purpose: These cookies remember your choices within the Service to provide a more personalized experience. This includes your UI preferences (e.g., "Focus Mode" vs. "Lounge Mode"), theme settings (if Dark Mode is added later), language selection, and notification preferences.
+Examples: ui_density_preference, sidebar_collapsed_state.
+Consequence of Disabling: The Service will still work, but it will not remember your specific settings each time you visit or reload the page.
+Performance & Analytics Cookies (Internal Only):
+Purpose: We use limited first-party cookies to collect anonymous data on how the Service is performing. This helps us identify bugs, monitor server load, and improve system stability. This data is aggregated and cannot identify you personally.
+Examples: error_log_session, latency_metric_id.
+Third-Party Access: We do not share this data with third-party analytics providers (e.g., Google Analytics). All analysis is performed internally by Semloh Systems.
+3. SPECIFIC COOKIES WE USE
+Cookie Name
+Type
+Duration
+Purpose
+__chatterbox_session
+Essential
+Session (expires on browser close)
+Maintains your secure login session and authenticates API requests.
+__chatterbox_csrf
+Essential
+Session
+Protects against Cross-Site Request Forgery (CSRF) attacks during form submissions.
+__chatterbox_prefs
+Preference
+1 Year
+Stores your UI layout, theme, and notification settings.
+__chatterbox_verify
+Essential
+1 Hour
+Temporarily stores email verification status during the signup/onboarding flow.
+4. THIRD-PARTY COOKIES
+We generally avoid third-party cookies. However, certain embedded services may set their own cookies if you interact with them:
+Stripe: If you access billing pages, Stripe may set cookies to process payments securely. These are governed by Stripe’s own privacy policy.
+External Media: If you embed content from external platforms (e.g., YouTube, Twitter) within a chat message, those platforms may set cookies when the content loads. We do not control these cookies.
+5. MANAGING YOUR COOKIES
+You have the right to decide whether to accept or reject cookies. You can exercise your cookie rights by setting your preferences in your browser.
+Browser Settings: Most web browsers allow you to control cookies through their settings. You can set your browser to refuse all cookies, accept only certain cookies, or notify you when a cookie is set.
+How to Manage:
+Chrome: Settings > Privacy and security > Cookies and other site data.
+Firefox: Options > Privacy & Security > Cookies and Site Data.
+Safari: Preferences > Privacy > Cookies and website data.
+Edge: Settings > Cookies and site permissions.
+Important Note: Because our Strictly Necessary cookies are essential for the Chatterbox platform to function (specifically for keeping you logged in and securing your messages), blocking all cookies will prevent you from using the Service.
+6. UPDATES TO THIS POLICY
+We may update this Cookie Policy from time to time to reflect changes in our practices or legal requirements. We will notify you of significant changes by posting the new policy on the Service and updating the "Last Updated" date.
+7. CONTACT US
+If you have any questions about our use of cookies, please contact us:
+Semloh Systems
+Email: contact@georgeholmes.io
+Address: Chicago, Illinois, USA

@@ -1,0 +1,52 @@
+TERMS OF SERVICE
+Last Updated: March 9, 2026
+1. AGREEMENT TO TERMS
+These Terms of Service ("Terms") constitute a legally binding agreement made between you ("User," "you," or "your") and Semloh Systems ("Company," "we," "us," or "our"), regarding your access to and use of the Chatterbox platform (the "Service"). The Service is a real-time communication platform providing organizational structures ("Clusters"), project containers ("Boxes"), and chat functionalities.
+By accessing or using the Service, you agree to be bound by these Terms. If you do not agree to these Terms, you must not access or use the Service.
+2. DESCRIPTION OF SERVICE
+Chatterbox is a SaaS application designed to facilitate real-time text, voice, and video communication. The Service allows users to create or join Clusters, manage Boxes within those Clusters, and participate in Chatrooms. Semloh Systems provides the infrastructure for these communications but does not monitor, edit, or control the content transmitted through the Service, except as necessary to enforce these Terms or comply with applicable laws.
+3. ELIGIBILITY
+You must be at least 13 years old to use the Service. By using the Service, you represent and warrant that you are at least 13 years old and have the legal capacity to enter into this agreement. If you are under 18, you represent that you have obtained permission from a parent or legal guardian.
+4. USER ACCOUNTS AND REGISTRATION
+Registration: To access certain features, you must register an account. You agree to provide accurate, current, and complete information during the registration process, including a valid email address.
+Security: You are responsible for safeguarding your password and for any activities or actions under your password. We encourage you to use strong, unique passwords.
+Username Policy: You may not select a username that is offensive, inappropriate, impersonates another person, or violates any third-party rights. Semloh Systems reserves the right to remove or change any username that violates this policy without prior notice. Prohibited usernames include, but are not limited to, those containing hate speech, harassment, sexually explicit terms, or profanity.
+One Account Per User: Unless explicitly authorized by us, you may not maintain more than one personal account.
+5. USER CONTENT AND CONDUCT
+Ownership: You retain all rights to the content you post, upload, or transmit through the Service ("User Content"). However, by submitting User Content, you grant Semloh Systems a worldwide, non-exclusive, royalty-free license to use, host, store, reproduce, modify, and communicate such content solely for the purpose of operating and providing the Service.
+Prohibited Conduct: You agree not to:
+Upload or transmit any User Content that is illegal, harmful, threatening, abusive, harassing, defamatory, vulgar, obscene, sexually explicit, or racially/ethnically objectionable.
+Impersonate any person or entity or falsely state your affiliation with a person or entity.
+Interfere with or disrupt the Service or servers or networks connected to the Service (e.g., via DDoS attacks, spamming, or introducing malware).
+Attempt to gain unauthorized access to any portion of the Service, other accounts, or computer systems connected to the Service.
+Use the Service to distribute unsolicited advertising or spam.
+Monitoring: While we do not actively monitor all User Content, we reserve the right to review, remove, or refuse to publish any User Content at our sole discretion, without notice, for any reason or no reason.
+6. INTELLECTUAL PROPERTY
+The Service, including its original content, features, functionality, design, code, and the "Chatterbox" name, logo, and style guide, are owned by Semloh Systems and are protected by United States and international copyright, trademark, patent, trade secret, and other intellectual property laws. You may not copy, modify, distribute, sell, or lease any part of the Service without our express written permission.
+7. BILLING AND PAYMENT
+Fees: Certain features of the Service may require payment of fees (e.g., Pro or Enterprise tiers). Fees are billed in advance on a monthly basis or based on usage metrics (e.g., storage volume) as described on the pricing page.
+No Refunds: Except as required by law, all fees are non-refundable.
+Changes to Fees: Semloh Systems reserves the right to adjust pricing for existing or new services at any time. Changes will be effective upon posting to the Service or via email notification.
+Taxes: You are responsible for paying all taxes associated with your use of the Service, excluding taxes on Semloh Systems' net income.
+8. DISCLAIMER OF WARRANTIES
+THE SERVICE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT ANY REPRESENTATIONS OR WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. SEMLOH SYSTEMS SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR SECURE. WE DO NOT WARRANT THAT THE SERVICE WILL MEET YOUR REQUIREMENTS OR THAT DEFECTS WILL BE CORRECTED.
+9. LIMITATION OF LIABILITY
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, SEMLOH SYSTEMS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, REVENUE, DATA, OR DATA USE, ARISING OUT OF OR RELATING TO YOUR ACCESS TO OR USE OF THE SERVICE, WHETHER BASED ON WARRANTY, CONTRACT, TORT (INCLUDING NEGLIGENCE), OR ANY OTHER LEGAL THEORY, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. OUR TOTAL AGGREGATE LIABILITY TO YOU FOR ANY CLAIM SHALL NOT EXCEED THE AMOUNT PAID BY YOU TO SEMLOH SYSTEMS IN THE SIX (6) MONTHS PRECEDING THE EVENT GIVING RISE TO THE CLAIM, OR ONE HUNDRED U.S. DOLLARS ($100.00) IF YOU HAVE NOT PAID ANY FEES.
+10. INDEMNIFICATION
+You agree to defend, indemnify, and hold harmless Semloh Systems, its officers, directors, employees, and agents from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising out of or relating to your violation of these Terms or your use of the Service, including your User Content and any conduct that violates applicable laws or infringes upon the rights of others.
+11. TERMINATION
+We may terminate or suspend your access to the Service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach these Terms. Upon termination, your right to use the Service will cease immediately. If you wish to terminate your account, you may do so by contacting us or using the account deletion feature within the Service. We may retain certain data as required by law or for legitimate business purposes (e.g., fraud prevention) even after account termination.
+12. GOVERNING LAW AND DISPUTE RESOLUTION
+These Terms shall be governed by and construed in accordance with the laws of the State of Illinois, without regard to its conflict of law provisions. Any dispute arising out of or relating to these Terms or the Service shall be subject to the exclusive jurisdiction of the state and federal courts located in Cook County, Chicago, Illinois. You hereby consent to the personal jurisdiction of such courts.
+13. CHANGES TO TERMS
+We reserve the right to modify these Terms at any time. We will provide notice of significant changes by posting the new Terms on the Service and updating the "Last Updated" date. Your continued use of the Service after such changes constitutes your acceptance of the new Terms.
+14. CONTACT INFORMATION
+If you have any questions about these Terms, please contact us at:
+Semloh Systems
+Email: contact@georgeholmes.io
+Principal Place of Business: Chicago, Illinois, USA
+15. MISCELLANEOUS
+Severability: If any provision of these Terms is held to be invalid or unenforceable, the remaining provisions will continue in full force and effect.
+Waiver: Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.
+Assignment: You may not assign or transfer these Terms without our prior written consent. Semloh Systems may assign these Terms without restriction.
+Entire Agreement: These Terms constitute the entire agreement between you and Semloh Systems regarding the Service and supersede any prior agreements.

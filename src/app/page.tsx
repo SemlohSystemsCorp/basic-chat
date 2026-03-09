@@ -489,9 +489,9 @@ export default function HomePage() {
               </div>
               <div className={styles.footerCol}>
                 <h4 className={styles.footerColTitle}>Legal</h4>
-                <a href="#" className={styles.footerLink}>Privacy</a>
-                <a href="#" className={styles.footerLink}>Terms</a>
-                <a href="#" className={styles.footerLink}>Cookie Policy</a>
+                <Link href="/privacy" className={styles.footerLink}>Privacy</Link>
+                <Link href="/terms" className={styles.footerLink}>Terms</Link>
+                <Link href="/cookies" className={styles.footerLink}>Cookie Policy</Link>
               </div>
             </div>
           </div>

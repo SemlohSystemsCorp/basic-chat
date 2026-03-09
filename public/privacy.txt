@@ -1,0 +1,64 @@
+PRIVACY POLICY
+Last Updated: March 9, 2026
+1. INTRODUCTION
+Semloh Systems ("we," "us," or "our") operates the Chatterbox platform (the "Service"). We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our Service.
+By using the Service, you consent to the data practices described in this policy. If you do not agree with the terms of this policy, please do not access the Service.
+2. INFORMATION WE COLLECT
+We collect information that identifies, relates to, describes, or could be linked to you ("Personal Information").
+A. Information You Provide Directly
+Account Data: When you register, we collect your email address, a hashed password, username, first name, last name, and date of birth.
+Profile Data: Optional information you provide, such as your bio, status message, and avatar URL.
+User Content: The messages, files, images, voice recordings, and video streams you transmit within Clusters, Boxes, and Chatrooms.
+Billing Data: If you subscribe to a paid tier, our payment processor (Stripe) collects your credit card details. Semloh Systems does not store full credit card numbers; we only receive a token and billing address details necessary for invoicing.
+B. Information Collected Automatically
+Usage Data: We collect data on how you interact with the Service, including timestamps of messages, channels visited, features used, and session duration.
+Device & Connection Data: We automatically collect your IP address, browser type, operating system, device identifiers, and approximate location derived from your IP address.
+Log Data: Our servers automatically record log information, including error reports and performance metrics, to ensure system stability.
+3. HOW WE USE YOUR INFORMATION
+We use the collected information for the following purposes:
+Service Provision: To create and maintain your account, facilitate real-time communication, and manage your Clusters and Boxes.
+Security & Moderation: To detect and prevent fraud, abuse, and security incidents; to enforce our Username Policy (blocking offensive terms); and to comply with legal obligations.
+Billing: To process payments, generate invoices, and manage subscription tiers based on usage (storage, history).
+Improvement: To analyze usage trends, debug edge cases, and improve the performance and features of the Service.
+Communication: To send you service-related announcements (e.g., password resets, verification emails, policy updates). We do not sell your email address for marketing purposes.
+4. DATA SHARING AND DISCLOSURE
+We do not sell, trade, or rent your Personal Information to third parties. We may share information only in the following situations:
+Service Providers: We share data with trusted third-party vendors who perform services on our behalf, such as:
+Hosting & Database: (e.g., Supabase/Convex) for data storage.
+Email Delivery: (e.g., Resend) for transactional emails.
+Payment Processing: (e.g., Stripe) for billing.
+CDN & Storage: For file and media delivery.
+These providers are contractually obligated to protect your data and use it only for the specified services.
+Legal Requirements: We may disclose information if required by law, subpoena, or governmental request, or to protect the rights, property, or safety of Semloh Systems, our users, or the public.
+Business Transfers: In the event of a merger, acquisition, or sale of assets, your information may be transferred as part of the transaction.
+5. DATA RETENTION
+Account Data: We retain your account information for as long as your account is active. If you delete your account, we will purge your Personal Information within 30 days, except where retention is required by law or for legitimate business interests (e.g., fraud prevention).
+Message History: Retention depends on your Organization's (Cluster) settings and subscription tier. Free tiers may archive older messages, while Pro/Enterprise tiers retain history indefinitely unless manually deleted by the user or admin.
+Logs: Server logs and audit trails are retained for a minimum of 90 days for security analysis, and up to 7 years for financial/tax compliance.
+6. DATA SECURITY
+We implement industry-standard security measures to protect your information:
+Encryption: Data is encrypted in transit using TLS 1.3. Passwords are hashed using strong algorithms (Argon2).
+Access Controls: Strict internal access controls limit employee access to Personal Information.
+Monitoring: We continuously monitor our systems for vulnerabilities and unauthorized access.
+Note: While we strive to protect your data, no method of transmission over the Internet or electronic storage is 100% secure. We cannot guarantee absolute security.
+7. YOUR RIGHTS AND CHOICES
+Depending on your location, you may have the following rights:
+Access: Request a copy of the Personal Information we hold about you.
+Correction: Request correction of inaccurate or incomplete data.
+Deletion: Request deletion of your account and associated data ("Right to be Forgotten").
+Export: Download your data in a portable format (JSON/CSV).
+Opt-Out: You may opt-out of non-essential communications at any time via the link in our emails or your account settings.
+To exercise these rights, please contact us at contact@georgeholmes.io. We will respond to verified requests within 30 days.
+8. COOKIES AND TRACKING
+We use essential cookies to maintain your session and authentication state. We do not use third-party advertising cookies or tracking pixels for behavioral advertising.
+9. CHILDREN'S PRIVACY
+The Service is not intended for children under the age of 13. We do not knowingly collect Personal Information from children under 13. If we become aware that we have collected such data, we will take steps to delete it immediately. Users must confirm they are at least 13 years old during registration.
+10. INTERNATIONAL DATA TRANSFERS
+Semloh Systems is based in the United States. Your information may be transferred to, and processed in, the United States. By using the Service, you acknowledge that your data may be subject to U.S. laws and regulations.
+11. CHANGES TO THIS POLICY
+We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the new policy on the Service and updating the "Last Updated" date. Your continued use of the Service after changes constitutes acceptance of the updated policy.
+12. CONTACT US
+If you have questions or concerns about this Privacy Policy or our data practices, please contact us:
+Semloh Systems
+Email: contact@georgeholmes.io
+Address: Chicago, Illinois, USA
