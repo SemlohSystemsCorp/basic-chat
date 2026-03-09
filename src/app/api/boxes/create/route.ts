@@ -38,11 +38,13 @@ export async function POST(request: NextRequest) {
       .insert({ box_id: box.id, user_id: user.id, role: 'owner' });
 
     // Create default #general channel
-    await supabase
+    const { data: generalChannel } = await supabase
       .from('channels')
-      .insert({ box_id: box.id, name: 'general', description: 'General discussion', created_by: user.id });
+      .insert({ box_id: box.id, name: 'general', description: 'General discussion', created_by: user.id })
+      .select('slug')
+      .single();
 
-    return NextResponse.json({ box });
+    return NextResponse.json({ box, generalChannelSlug: generalChannel?.slug });
   } catch (error) {
     console.error('Create box error:', error);
     return NextResponse.json({ error: 'Failed to create box' }, { status: 500 });

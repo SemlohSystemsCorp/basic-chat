@@ -19,7 +19,11 @@ drop function if exists public.handle_new_user() cascade;
 drop function if exists public.get_user_box_ids(uuid) cascade;
 drop function if exists public.get_user_admin_box_ids(uuid) cascade;
 drop function if exists public.generate_box_slug() cascade;
+drop function if exists public.generate_channel_slug() cascade;
 
+drop table if exists public.call_invites cascade;
+drop table if exists public.call_participants cascade;
+drop table if exists public.calls cascade;
 drop table if exists public.verification_codes cascade;
 drop table if exists public.invites cascade;
 drop table if exists public.messages cascade;
@@ -159,12 +163,28 @@ create policy "Box admins can delete members"
   );
 
 -- ============================================
--- CHANNELS
+-- CHANNELS — slug is a 10-digit number
 -- ============================================
+create or replace function public.generate_channel_slug()
+returns text as $$
+declare
+  new_slug text;
+  slug_exists boolean;
+begin
+  loop
+    new_slug := lpad(floor(random() * 10000000000)::bigint::text, 10, '0');
+    select exists(select 1 from public.channels where slug = new_slug) into slug_exists;
+    exit when not slug_exists;
+  end loop;
+  return new_slug;
+end;
+$$ language plpgsql;
+
 create table public.channels (
   id uuid default uuid_generate_v4() primary key,
   box_id uuid references public.boxes(id) on delete cascade not null,
   name text not null,
+  slug text not null unique default public.generate_channel_slug(),
   description text,
   is_private boolean default false,
   created_by uuid references public.profiles(id) on delete set null,
@@ -199,6 +219,7 @@ create table public.messages (
   channel_id uuid references public.channels(id) on delete cascade not null,
   user_id uuid references public.profiles(id) on delete cascade not null,
   content text not null,
+  attachments jsonb default '[]'::jsonb,
   edited_at timestamptz,
   created_at timestamptz default now() not null
 );
@@ -265,6 +286,148 @@ create policy "Box admins can update invites"
   );
 
 -- ============================================
+-- DIRECT MESSAGES
+-- ============================================
+create table public.dm_conversations (
+  id uuid default uuid_generate_v4() primary key,
+  box_id uuid references public.boxes(id) on delete cascade not null,
+  user1_id uuid references public.profiles(id) on delete cascade not null,
+  user2_id uuid references public.profiles(id) on delete cascade not null,
+  created_at timestamptz default now() not null,
+  unique(box_id, user1_id, user2_id),
+  check (user1_id < user2_id)
+);
+
+alter table public.dm_conversations enable row level security;
+
+create policy "Users can view own DM conversations"
+  on public.dm_conversations for select
+  using (auth.uid() = user1_id or auth.uid() = user2_id);
+
+create policy "Users can create DM conversations"
+  on public.dm_conversations for insert
+  with check (auth.uid() = user1_id or auth.uid() = user2_id);
+
+create table public.dm_messages (
+  id uuid default uuid_generate_v4() primary key,
+  conversation_id uuid references public.dm_conversations(id) on delete cascade not null,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  content text,
+  attachments jsonb default '[]'::jsonb,
+  created_at timestamptz default now() not null
+);
+
+alter table public.dm_messages enable row level security;
+
+create policy "Users can view DM messages in their conversations"
+  on public.dm_messages for select
+  using (
+    conversation_id in (
+      select id from public.dm_conversations
+      where user1_id = auth.uid() or user2_id = auth.uid()
+    )
+  );
+
+create policy "Users can insert DM messages in their conversations"
+  on public.dm_messages for insert
+  with check (
+    auth.uid() = user_id
+    and conversation_id in (
+      select id from public.dm_conversations
+      where user1_id = auth.uid() or user2_id = auth.uid()
+    )
+  );
+
+create policy "Users can delete own DM messages"
+  on public.dm_messages for delete
+  using (user_id = auth.uid());
+
+-- ============================================
+-- CALLS
+-- ============================================
+create table public.calls (
+  id uuid default uuid_generate_v4() primary key,
+  box_id uuid references public.boxes(id) on delete cascade not null,
+  channel_id uuid references public.channels(id) on delete set null,
+  created_by uuid references public.profiles(id) on delete cascade not null,
+  call_code text not null unique default substr(replace(gen_random_uuid()::text, '-', ''), 1, 8),
+  room_name text not null,
+  room_url text,
+  title text,
+  status text default 'active' check (status in ('active', 'ended')),
+  started_at timestamptz default now() not null,
+  ended_at timestamptz
+);
+
+alter table public.calls enable row level security;
+
+create policy "Box members can view calls"
+  on public.calls for select
+  using (box_id in (select public.get_user_box_ids(auth.uid())));
+
+create policy "Box members can create calls"
+  on public.calls for insert
+  with check (
+    auth.uid() = created_by
+    and box_id in (select public.get_user_box_ids(auth.uid()))
+  );
+
+create policy "Call creator can update calls"
+  on public.calls for update
+  using (created_by = auth.uid());
+
+create table public.call_participants (
+  id uuid default uuid_generate_v4() primary key,
+  call_id uuid references public.calls(id) on delete cascade not null,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  joined_at timestamptz default now() not null,
+  left_at timestamptz,
+  unique(call_id, user_id)
+);
+
+alter table public.call_participants enable row level security;
+
+create policy "Box members can view call participants"
+  on public.call_participants for select
+  using (
+    call_id in (
+      select id from public.calls
+      where box_id in (select public.get_user_box_ids(auth.uid()))
+    )
+  );
+
+create policy "Users can join calls"
+  on public.call_participants for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own participation"
+  on public.call_participants for update
+  using (user_id = auth.uid());
+
+create table public.call_invites (
+  id uuid default uuid_generate_v4() primary key,
+  call_id uuid references public.calls(id) on delete cascade not null,
+  invited_by uuid references public.profiles(id) on delete cascade not null,
+  invited_user_id uuid references public.profiles(id) on delete cascade not null,
+  status text default 'pending' check (status in ('pending', 'accepted', 'declined', 'missed')),
+  created_at timestamptz default now() not null
+);
+
+alter table public.call_invites enable row level security;
+
+create policy "Users can view own call invites"
+  on public.call_invites for select
+  using (invited_user_id = auth.uid() or invited_by = auth.uid());
+
+create policy "Box members can create call invites"
+  on public.call_invites for insert
+  with check (auth.uid() = invited_by);
+
+create policy "Invited users can update call invites"
+  on public.call_invites for update
+  using (invited_user_id = auth.uid());
+
+-- ============================================
 -- VERIFICATION CODES
 -- ============================================
 create table public.verification_codes (
@@ -309,6 +472,7 @@ create trigger update_channels_updated_at
 create index idx_box_members_user_id on public.box_members(user_id);
 create index idx_box_members_box_id on public.box_members(box_id);
 create index idx_channels_box_id on public.channels(box_id);
+create index idx_channels_slug on public.channels(slug);
 create index idx_messages_channel_id on public.messages(channel_id);
 create index idx_messages_created_at on public.messages(created_at desc);
 create index idx_invites_email on public.invites(email);
@@ -318,7 +482,22 @@ create index idx_boxes_slug on public.boxes(slug);
 create index idx_verification_codes_email on public.verification_codes(email);
 create index idx_verification_codes_email_code on public.verification_codes(email, code);
 
+create index idx_calls_box_id on public.calls(box_id);
+create index idx_calls_call_code on public.calls(call_code);
+create index idx_calls_status on public.calls(status);
+create index idx_call_participants_call on public.call_participants(call_id);
+create index idx_call_invites_user on public.call_invites(invited_user_id);
+create index idx_call_invites_call on public.call_invites(call_id);
+
+create index idx_dm_conversations_user1 on public.dm_conversations(user1_id);
+create index idx_dm_conversations_user2 on public.dm_conversations(user2_id);
+create index idx_dm_conversations_box on public.dm_conversations(box_id);
+create index idx_dm_messages_conversation on public.dm_messages(conversation_id);
+create index idx_dm_messages_created_at on public.dm_messages(created_at desc);
+
 -- ============================================
 -- REALTIME
 -- ============================================
 alter publication supabase_realtime add table public.messages;
+alter publication supabase_realtime add table public.dm_messages;
+alter publication supabase_realtime add table public.call_invites;

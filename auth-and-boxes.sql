@@ -89,11 +89,23 @@ create table public.box_members (
   unique(box_id, user_id)
 );
 
--- NOW create the boxes SELECT policy (box_members exists)
+-- Security definer functions to avoid infinite recursion in RLS policies
+-- (policies on box_members can't query box_members directly)
+create or replace function public.get_user_box_ids(uid uuid)
+returns setof uuid as $$
+  select box_id from public.box_members where user_id = uid;
+$$ language sql security definer stable;
+
+create or replace function public.get_user_admin_box_ids(uid uuid)
+returns setof uuid as $$
+  select box_id from public.box_members where user_id = uid and role in ('owner', 'admin');
+$$ language sql security definer stable;
+
+-- NOW create the boxes SELECT policy (box_members + helpers exist)
 create policy "Box members can view their boxes"
   on public.boxes for select
   using (
-    id in (select box_id from public.box_members where user_id = auth.uid())
+    id in (select public.get_user_box_ids(auth.uid()))
   );
 
 alter table public.box_members enable row level security;
@@ -101,26 +113,20 @@ alter table public.box_members enable row level security;
 create policy "Members can view members of their boxes"
   on public.box_members for select
   using (
-    box_id in (select box_id from public.box_members where user_id = auth.uid())
+    box_id in (select public.get_user_box_ids(auth.uid()))
   );
 
 create policy "Box admins can insert members"
   on public.box_members for insert
   with check (
-    box_id in (
-      select box_id from public.box_members
-      where user_id = auth.uid() and role in ('owner', 'admin')
-    )
+    box_id in (select public.get_user_admin_box_ids(auth.uid()))
     or user_id = auth.uid()
   );
 
 create policy "Box admins can delete members"
   on public.box_members for delete
   using (
-    box_id in (
-      select box_id from public.box_members
-      where user_id = auth.uid() and role in ('owner', 'admin')
-    )
+    box_id in (select public.get_user_admin_box_ids(auth.uid()))
     or user_id = auth.uid()
   );
 
@@ -144,15 +150,14 @@ alter table public.channels enable row level security;
 create policy "Box members can view channels"
   on public.channels for select
   using (
-    box_id in (select box_id from public.box_members where user_id = auth.uid())
+    box_id in (select public.get_user_box_ids(auth.uid()))
   );
 
 create policy "Box admins can create channels"
   on public.channels for insert
   with check (
     box_id in (
-      select box_id from public.box_members
-      where user_id = auth.uid() and role in ('owner', 'admin')
+      select public.get_user_admin_box_ids(auth.uid())
     )
   );
 
@@ -160,8 +165,7 @@ create policy "Box admins can update channels"
   on public.channels for update
   using (
     box_id in (
-      select box_id from public.box_members
-      where user_id = auth.uid() and role in ('owner', 'admin')
+      select public.get_user_admin_box_ids(auth.uid())
     )
   );
 
@@ -169,8 +173,7 @@ create policy "Box admins can delete channels"
   on public.channels for delete
   using (
     box_id in (
-      select box_id from public.box_members
-      where user_id = auth.uid() and role in ('owner', 'admin')
+      select public.get_user_admin_box_ids(auth.uid())
     )
   );
 
@@ -193,8 +196,7 @@ create policy "Box members can view messages"
   using (
     channel_id in (
       select c.id from public.channels c
-      inner join public.box_members bm on bm.box_id = c.box_id
-      where bm.user_id = auth.uid()
+      where c.box_id in (select public.get_user_box_ids(auth.uid()))
     )
   );
 
@@ -204,8 +206,7 @@ create policy "Box members can insert messages"
     auth.uid() = user_id
     and channel_id in (
       select c.id from public.channels c
-      inner join public.box_members bm on bm.box_id = c.box_id
-      where bm.user_id = auth.uid()
+      where c.box_id in (select public.get_user_box_ids(auth.uid()))
     )
   );
 
@@ -237,8 +238,7 @@ create policy "Box admins can view invites"
   on public.invites for select
   using (
     box_id in (
-      select box_id from public.box_members
-      where user_id = auth.uid() and role in ('owner', 'admin')
+      select public.get_user_admin_box_ids(auth.uid())
     )
     or email = (select email from public.profiles where id = auth.uid())
   );
@@ -247,8 +247,7 @@ create policy "Box admins can create invites"
   on public.invites for insert
   with check (
     box_id in (
-      select box_id from public.box_members
-      where user_id = auth.uid() and role in ('owner', 'admin')
+      select public.get_user_admin_box_ids(auth.uid())
     )
   );
 
@@ -256,8 +255,7 @@ create policy "Box admins can update invites"
   on public.invites for update
   using (
     box_id in (
-      select box_id from public.box_members
-      where user_id = auth.uid() and role in ('owner', 'admin')
+      select public.get_user_admin_box_ids(auth.uid())
     )
     or email = (select email from public.profiles where id = auth.uid())
   );

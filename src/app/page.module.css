@@ -14,7 +14,7 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.97);
+  background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -54,6 +54,25 @@
   gap: 4px;
 }
 
+.themeToggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.themeToggle:hover {
+  color: var(--color-heading);
+  border-color: var(--color-heading);
+}
+
 .navLink {
   padding: 8px 14px;
   font-size: 14px;
@@ -79,15 +98,15 @@
 .heroInner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 32px 0;
+  padding: 88px 32px 0;
   display: grid;
   grid-template-columns: 1fr 1.1fr;
-  gap: 64px;
+  gap: 72px;
   align-items: start;
 }
 
 .heroContent {
-  padding-top: 24px;
+  padding-top: 32px;
 }
 
 .heroBadge {
@@ -114,23 +133,23 @@
   font-size: 48px;
   font-weight: 700;
   color: var(--color-heading);
-  line-height: 1.1;
-  margin-bottom: 20px;
+  line-height: 1.12;
+  margin-bottom: 24px;
   letter-spacing: -0.8px;
 }
 
 .heroSubtitle {
   font-size: 17px;
   color: var(--color-body);
-  line-height: 1.65;
-  margin-bottom: 32px;
+  line-height: 1.7;
+  margin-bottom: 36px;
   max-width: 480px;
 }
 
 .heroCta {
   display: flex;
-  gap: 12px;
-  margin-bottom: 32px;
+  gap: 14px;
+  margin-bottom: 36px;
 }
 
 .heroMeta {
@@ -173,7 +192,7 @@
 }
 
 .mockupSidebar {
-  background: #FAFBFD;
+  background: var(--color-bg);
   border-right: 1px solid var(--color-border);
   padding: 16px 0;
 }
@@ -328,7 +347,7 @@
 
 /* ── Logo Bar ── */
 .logoBar {
-  padding: 48px 32px;
+  padding: 56px 32px;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -415,12 +434,14 @@
 
 .feature {
   padding: 32px 28px;
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  transition: box-shadow var(--transition);
+  transition: box-shadow var(--transition), transform var(--transition);
 }
 
 .feature:hover {
+  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
@@ -498,7 +519,7 @@
 }
 
 .pricingCardBody {
-  padding: 32px 28px;
+  padding: 36px 28px;
 }
 
 .pricingPlan {
@@ -612,8 +633,8 @@
 
 /* ── CTA Banner ── */
 .ctaBanner {
-  padding: 80px 32px;
-  background: var(--color-heading);
+  padding: 88px 32px;
+  background: var(--color-primary);
   text-align: center;
 }
 
@@ -642,9 +663,20 @@
   justify-content: center;
 }
 
+.ctaBtn {
+  background: #fff;
+  color: var(--color-primary);
+  font-weight: 600;
+  border: none;
+}
+
+.ctaBtn:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
 /* ── Footer ── */
 .footer {
-  padding: 64px 32px 32px;
+  padding: 72px 32px 36px;
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
 }

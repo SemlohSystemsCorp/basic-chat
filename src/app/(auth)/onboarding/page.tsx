@@ -66,10 +66,6 @@ function OnboardingContent() {
       .eq('status', 'pending');
 
     if (invites && invites.length > 0) {
-      if (invites.length === 1) {
-        await joinBox(invites[0].box_id, invites[0].id);
-        return;
-      }
       setPendingInvites(invites as unknown as PendingInvite[]);
     }
 
@@ -130,9 +126,9 @@ function OnboardingContent() {
         </div>
 
         {/* Pending invites */}
-        {pendingInvites.length > 0 && (
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Pending invitations</h3>
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Pending invitations</h3>
+          {pendingInvites.length > 0 ? (
             <div className={styles.inviteList}>
               {pendingInvites.map((invite) => (
                 <div key={invite.id} className={styles.inviteItem}>
@@ -155,10 +151,12 @@ function OnboardingContent() {
                 </div>
               ))}
             </div>
+          ) : (
+            <p className={styles.noInvites}>You don&apos;t have any invites.</p>
+          )}
+        </div>
 
-            <div className="auth-divider">or get started another way</div>
-          </div>
-        )}
+        <div className="auth-divider">or get started another way</div>
 
         {/* Two option cards */}
         <div className={styles.optionGrid}>

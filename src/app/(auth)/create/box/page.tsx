@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import styles from './create-box.module.css';
 
 interface CreatedBox {
@@ -22,13 +21,12 @@ export default function CreateBoxPage() {
 
   // Invite step state
   const [box, setBox] = useState<CreatedBox | null>(null);
+  const [generalChannelSlug, setGeneralChannelSlug] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
   const [invitedEmails, setInvitedEmails] = useState<string[]>([]);
   const [inviting, setInviting] = useState(false);
   const [inviteError, setInviteError] = useState('');
   const [codeCopied, setCodeCopied] = useState(false);
-
-  const supabase = createClient();
 
   async function handleCreateBox(e: React.FormEvent) {
     e.preventDefault();
@@ -57,6 +55,7 @@ export default function CreateBoxPage() {
     }
 
     setBox(data.box);
+    setGeneralChannelSlug(data.generalChannelSlug || '');
     setStep('invite');
     setCreating(false);
   }
@@ -81,19 +80,16 @@ export default function CreateBoxPage() {
 
     if (!box) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    const res = await fetch('/api/invites/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, boxId: box.id }),
+    });
 
-    const { error: insertError } = await supabase
-      .from('invites')
-      .insert({
-        box_id: box.id,
-        email,
-        invited_by: user.id,
-      });
+    const data = await res.json();
 
-    if (insertError) {
-      setInviteError(insertError.message);
+    if (!res.ok) {
+      setInviteError(data.error || 'Failed to send invite.');
       setInviting(false);
       return;
     }
@@ -230,7 +226,7 @@ export default function CreateBoxPage() {
           <div style={{ marginTop: 20 }}>
             <button
               className="btn btn-primary btn-full"
-              onClick={() => router.push(`/w/${box?.slug}`)}
+              onClick={() => router.push(generalChannelSlug ? `/w/${box?.slug}/c/${generalChannelSlug}` : `/w/${box?.slug}`)}
             >
               {invitedEmails.length > 0 ? 'Go to your Box' : 'Skip for now'}
             </button>
