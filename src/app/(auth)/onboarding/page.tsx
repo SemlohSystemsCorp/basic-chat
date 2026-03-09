@@ -25,6 +25,7 @@ function OnboardingContent() {
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
+  const [displayName, setDisplayName] = useState('');
 
   const supabase = createClient();
 
@@ -39,6 +40,8 @@ function OnboardingContent() {
       router.push('/login');
       return;
     }
+
+    setDisplayName(user.user_metadata?.display_name || user.email?.split('@')[0] || '');
 
     // Check if user already belongs to a box
     const { data: memberships } = await supabase
@@ -101,11 +104,9 @@ function OnboardingContent() {
     return (
       <div className={styles.page}>
         <div className={styles.container}>
-          <div className="auth-card">
-            <div className={styles.loadingState}>
-              <div className="spinner" />
-              <p className={styles.loadingText}>Setting things up...</p>
-            </div>
+          <div className={styles.loadingState}>
+            <div className="spinner" />
+            <p className={styles.loadingText}>Setting things up...</p>
           </div>
         </div>
       </div>
@@ -116,19 +117,28 @@ function OnboardingContent() {
     <div className={styles.page}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <div className="auth-logo" style={{ textAlign: 'center' }}>Chatterbox</div>
-          <h1 className="auth-title" style={{ textAlign: 'center', fontSize: 26 }}>
-            Welcome to Chatterbox
+          <div className={styles.welcomeIcon}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          </div>
+          <h1 className={styles.welcomeTitle}>
+            {displayName ? `Hey ${displayName}!` : 'Welcome to Chatterbox'}
           </h1>
-          <p className="auth-subtitle" style={{ textAlign: 'center', marginBottom: 0 }}>
-            Get started by joining an existing workspace or creating your own.
+          <p className={styles.welcomeSubtitle}>
+            Your team communication hub. Join an existing workspace or create your own to get started.
           </p>
         </div>
 
         {/* Pending invites */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Pending invitations</h3>
-          {pendingInvites.length > 0 ? (
+        {pendingInvites.length > 0 && (
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0" />
+              </svg>
+              You&apos;ve been invited
+            </h3>
             <div className={styles.inviteList}>
               {pendingInvites.map((invite) => (
                 <div key={invite.id} className={styles.inviteItem}>
@@ -146,20 +156,34 @@ function OnboardingContent() {
                     onClick={() => joinBox(invite.box_id, invite.id)}
                     disabled={joining}
                   >
-                    {joining ? 'Joining...' : 'Join'}
+                    {joining ? 'Joining...' : 'Accept'}
                   </button>
                 </div>
               ))}
             </div>
-          ) : (
-            <p className={styles.noInvites}>You don&apos;t have any invites.</p>
-          )}
-        </div>
+          </div>
+        )}
 
-        <div className="auth-divider">or get started another way</div>
+        {pendingInvites.length > 0 && (
+          <div className="auth-divider">or get started another way</div>
+        )}
 
-        {/* Two option cards */}
+        {/* Option cards */}
         <div className={styles.optionGrid}>
+          <Link href="/create/box" className={styles.optionCard}>
+            <div className={styles.optionIcon}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </div>
+            <h3 className={styles.optionTitle}>Create a Box</h3>
+            <p className={styles.optionDesc}>
+              Start fresh or migrate from Slack / Teams.
+            </p>
+            <span className={styles.optionAction}>Get started &rarr;</span>
+          </Link>
+
           <Link href="/onboarding/join" className={styles.optionCard}>
             <div className={styles.optionIcon}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -170,23 +194,9 @@ function OnboardingContent() {
             </div>
             <h3 className={styles.optionTitle}>Join a Box</h3>
             <p className={styles.optionDesc}>
-              Have an invite code? Enter it to join your team&apos;s workspace.
+              Have an invite code? Enter it to join your team.
             </p>
-            <span className={styles.optionAction}>Enter invite code &rarr;</span>
-          </Link>
-
-          <Link href="/create/box" className={styles.optionCard}>
-            <div className={styles.optionIcon}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-            </div>
-            <h3 className={styles.optionTitle}>Create a Box</h3>
-            <p className={styles.optionDesc}>
-              Start a new workspace for your team, project, or community.
-            </p>
-            <span className={styles.optionAction}>Set up your workspace &rarr;</span>
+            <span className={styles.optionAction}>Enter code &rarr;</span>
           </Link>
         </div>
       </div>
@@ -200,10 +210,8 @@ export default function OnboardingPage() {
       fallback={
         <div className={styles.page}>
           <div className={styles.container}>
-            <div className="auth-card">
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '40px 0' }}>
-                <div className="spinner" />
-              </div>
+            <div className={styles.loadingState}>
+              <div className="spinner" />
             </div>
           </div>
         </div>

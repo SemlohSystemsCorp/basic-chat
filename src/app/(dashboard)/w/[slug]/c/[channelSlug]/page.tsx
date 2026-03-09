@@ -396,11 +396,18 @@ export default function ChannelPage() {
   }
 
   // Group messages Discord-style: consecutive messages by same user within 5 minutes
-  function shouldShowHeader(msg: MessageData, prevMsg: MessageData | null): boolean {
+  function shouldShowHeader(msg: MessageData, prevMsg: MessageData | null, index: number): boolean {
     if (!prevMsg) return true;
     if (msg.user_id !== prevMsg.user_id) return true;
     const diff = new Date(msg.created_at).getTime() - new Date(prevMsg.created_at).getTime();
-    return diff > 5 * 60 * 1000;
+    if (diff > 5 * 60 * 1000) return true;
+    // Show avatar every 20 consecutive messages from the same user
+    let consecutive = 0;
+    for (let j = index - 1; j >= 0; j--) {
+      if (messages[j].user_id !== msg.user_id) break;
+      consecutive++;
+    }
+    return consecutive > 0 && consecutive % 20 === 0;
   }
 
   function isImageType(type: string) {
@@ -898,7 +905,7 @@ export default function ChannelPage() {
               <div className={styles.messages}>
                 {messages.map((msg, i) => {
                   const prev = i > 0 ? messages[i - 1] : null;
-                  const showHeader = shouldShowHeader(msg, prev);
+                  const showHeader = shouldShowHeader(msg, prev, i);
                   const showDateDivider = !prev || isDifferentDay(prev.created_at, msg.created_at);
 
                   return (

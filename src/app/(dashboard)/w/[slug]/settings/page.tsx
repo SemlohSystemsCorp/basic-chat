@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useWorkspace } from '../workspace-context';
 import styles from '@/app/(dashboard)/dashboard/settings/settings.module.css';
 
-type Section = 'general' | 'members' | 'roles' | 'invites' | 'permissions' | 'danger';
+type Section = 'general' | 'members' | 'roles' | 'invites' | 'permissions' | 'import' | 'danger';
 
 export default function WorkspaceSettingsPage() {
   const router = useRouter();
@@ -40,6 +40,21 @@ export default function WorkspaceSettingsPage() {
   // Member management
   const [updatingMember, setUpdatingMember] = useState<string | null>(null);
 
+  // Import
+  const [slackConnection, setSlackConnection] = useState<{ slack_team_name: string; connected_at: string } | null>(null);
+  const [loadingSlackStatus, setLoadingSlackStatus] = useState(false);
+  const [slackChannels, setSlackChannels] = useState<{ id: string; name: string; purpose: string; num_members: number }[]>([]);
+  const [selectedSlackChannels, setSelectedSlackChannels] = useState<Set<string>>(new Set());
+  const [loadingSlackChannels, setLoadingSlackChannels] = useState(false);
+  const [importingSlack, setImportingSlack] = useState(false);
+  const [slackImportResult, setSlackImportResult] = useState<{
+    channelsCreated: number;
+    messagesImported: number;
+    channelsSkipped: number;
+    errors: string[];
+  } | null>(null);
+  const [slackImportError, setSlackImportError] = useState('');
+
   useEffect(() => {
     if (box) {
       setBoxName(box.name || '');
@@ -62,6 +77,44 @@ export default function WorkspaceSettingsPage() {
       setAllowMemberInvites(data.allow_member_invites ?? true);
       setAllowMemberChannels(data.allow_member_channels ?? true);
     }
+  }
+
+  useEffect(() => {
+    if (box) checkSlackConnection();
+  }, [box]);
+
+  async function checkSlackConnection() {
+    if (!box) return;
+    setLoadingSlackStatus(true);
+    try {
+      const res = await fetch(`/api/import/slack?boxId=${box.id}`);
+      const data = await res.json();
+      if (data.connected && data.connection) {
+        setSlackConnection(data.connection);
+      }
+    } catch { /* ignore */ }
+    setLoadingSlackStatus(false);
+  }
+
+  async function loadSlackChannels() {
+    if (!box) return;
+    setLoadingSlackChannels(true);
+    setSlackImportError('');
+    try {
+      const res = await fetch('/api/import/slack', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ boxId: box.id }),
+      });
+      const data = await res.json();
+      if (data.channels) {
+        setSlackChannels(data.channels);
+        setSelectedSlackChannels(new Set(data.channels.map((ch: { id: string }) => ch.id)));
+      }
+    } catch {
+      setSlackImportError('Failed to load Slack channels.');
+    }
+    setLoadingSlackChannels(false);
   }
 
   if (!isAdmin) {
@@ -190,6 +243,39 @@ export default function WorkspaceSettingsPage() {
     window.location.reload();
   }
 
+  async function handleSlackImport() {
+    if (!box) return;
+
+    setImportingSlack(true);
+    setSlackImportError('');
+    setSlackImportResult(null);
+
+    try {
+      const res = await fetch('/api/import/slack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          boxId: box.id,
+          channelIds: Array.from(selectedSlackChannels),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setSlackImportError(data.error || 'Import failed.');
+        setImportingSlack(false);
+        return;
+      }
+
+      setSlackImportResult(data.results);
+    } catch {
+      setSlackImportError('Import failed. Please try again.');
+    }
+
+    setImportingSlack(false);
+  }
+
   async function handleDeleteWorkspace() {
     if (!box || !user) return;
     if (box.owner_id !== user.id) {
@@ -224,6 +310,7 @@ export default function WorkspaceSettingsPage() {
     { key: 'members', label: 'Members', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
     { key: 'invites', label: 'Invites', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> },
     { key: 'permissions', label: 'Permissions', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> },
+    { key: 'import', label: 'Import Data', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> },
     { key: 'danger', label: 'Danger Zone', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> },
   ];
 
@@ -425,6 +512,152 @@ export default function WorkspaceSettingsPage() {
 
                 <SaveBar section="permissions" saving={savingSection === 'permissions'} />
               </form>
+            </>
+          )}
+
+          {activeSection === 'import' && (
+            <>
+              <h2 className={styles.heading}>Import Data</h2>
+              <p className={styles.headingDesc}>Import channels and messages from Slack via OAuth.</p>
+
+              <div className={styles.card}>
+                <div className={styles.settingRow}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <svg width="28" height="28" viewBox="0 0 127 127" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+                      <path d="M27.2 80c0 7.3-5.9 13.2-13.2 13.2C6.7 93.2.8 87.3.8 80c0-7.3 5.9-13.2 13.2-13.2h13.2V80zm6.6 0c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2v33c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V80z" fill="#E01E5A"/>
+                      <path d="M47 27c-7.3 0-13.2-5.9-13.2-13.2C33.8 6.5 39.7.6 47 .6c7.3 0 13.2 5.9 13.2 13.2V27H47zm0 6.7c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H13.9C6.6 60.1.7 54.2.7 46.9c0-7.3 5.9-13.2 13.2-13.2H47z" fill="#36C5F0"/>
+                      <path d="M99.9 46.9c0-7.3 5.9-13.2 13.2-13.2 7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H99.9V46.9zm-6.6 0c0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V13.8C66.9 6.5 72.8.6 80.1.6c7.3 0 13.2 5.9 13.2 13.2v33.1z" fill="#2EB67D"/>
+                      <path d="M80.1 99.8c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2-7.3 0-13.2-5.9-13.2-13.2V99.8h13.2zm0-6.6c-7.3 0-13.2-5.9-13.2-13.2 0-7.3 5.9-13.2 13.2-13.2h33.1c7.3 0 13.2 5.9 13.2 13.2 0 7.3-5.9 13.2-13.2 13.2H80.1z" fill="#ECB22E"/>
+                    </svg>
+                    <div>
+                      <div className={styles.settingLabel}>Import from Slack</div>
+                      <div className={styles.settingDesc}>
+                        {slackConnection
+                          ? `Connected to ${slackConnection.slack_team_name}`
+                          : 'Connect your Slack workspace to import channels and messages.'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: 16 }}>
+                  {loadingSlackStatus ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0' }}>
+                      <span className="spinner spinner-sm" />
+                      <span style={{ fontSize: 13, color: 'var(--color-muted)' }}>Checking connection...</span>
+                    </div>
+                  ) : slackConnection ? (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: 'rgba(0, 208, 132, 0.08)', border: '1px solid rgba(0, 208, 132, 0.2)', borderRadius: 'var(--radius)', marginBottom: 12 }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0a8a5a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                          <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        <span style={{ fontSize: 13, color: '#0a8a5a' }}>
+                          Connected to <strong>{slackConnection.slack_team_name}</strong>
+                        </span>
+                      </div>
+
+                      {slackChannels.length === 0 && !loadingSlackChannels && (
+                        <button className="btn btn-primary btn-sm" onClick={loadSlackChannels}>
+                          Load Slack channels
+                        </button>
+                      )}
+
+                      {loadingSlackChannels && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 0' }}>
+                          <span className="spinner spinner-sm" />
+                          <span style={{ fontSize: 13, color: 'var(--color-muted)' }}>Loading channels from Slack...</span>
+                        </div>
+                      )}
+
+                      {slackChannels.length > 0 && (
+                        <>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: 'var(--color-heading)', cursor: 'pointer' }}>
+                              <input
+                                type="checkbox"
+                                checked={selectedSlackChannels.size === slackChannels.length}
+                                onChange={() => {
+                                  if (selectedSlackChannels.size === slackChannels.length) {
+                                    setSelectedSlackChannels(new Set());
+                                  } else {
+                                    setSelectedSlackChannels(new Set(slackChannels.map(ch => ch.id)));
+                                  }
+                                }}
+                                style={{ accentColor: 'var(--color-primary)' }}
+                              />
+                              Select all ({slackChannels.length})
+                            </label>
+                          </div>
+                          <div style={{ maxHeight: 280, overflowY: 'auto', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)' }}>
+                            {slackChannels.map(ch => (
+                              <label key={ch.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', cursor: 'pointer', borderBottom: '1px solid var(--color-border)' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={selectedSlackChannels.has(ch.id)}
+                                  onChange={() => {
+                                    setSelectedSlackChannels(prev => {
+                                      const next = new Set(prev);
+                                      if (next.has(ch.id)) next.delete(ch.id);
+                                      else next.add(ch.id);
+                                      return next;
+                                    });
+                                  }}
+                                  style={{ accentColor: 'var(--color-primary)' }}
+                                />
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-heading)' }}># {ch.name}</div>
+                                  {ch.purpose && <div style={{ fontSize: 12, color: 'var(--color-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.purpose}</div>}
+                                </div>
+                                <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>{ch.num_members}</span>
+                              </label>
+                            ))}
+                          </div>
+
+                          <button
+                            className="btn btn-primary btn-sm"
+                            style={{ marginTop: 12 }}
+                            onClick={handleSlackImport}
+                            disabled={importingSlack || selectedSlackChannels.size === 0}
+                          >
+                            {importingSlack ? (
+                              <><span className="spinner spinner-sm" /> Importing...</>
+                            ) : (
+                              `Import ${selectedSlackChannels.size} channel${selectedSlackChannels.size !== 1 ? 's' : ''}`
+                            )}
+                          </button>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <a
+                      href={`/api/import/slack/oauth?boxId=${box?.id}&returnTo=/w/${slug}/settings`}
+                      className="btn btn-primary btn-sm"
+                    >
+                      Connect to Slack
+                    </a>
+                  )}
+
+                  {slackImportError && (
+                    <p style={{ fontSize: 13, color: 'var(--color-error)', marginTop: 8 }}>{slackImportError}</p>
+                  )}
+
+                  {slackImportResult && (
+                    <div style={{ marginTop: 12, padding: '12px 16px', background: 'rgba(0, 208, 132, 0.08)', border: '1px solid rgba(0, 208, 132, 0.2)', borderRadius: 'var(--radius)', fontSize: 13, color: '#0a8a5a' }}>
+                      Import complete: {slackImportResult.channelsCreated} channels created, {slackImportResult.messagesImported} messages imported.
+                      {slackImportResult.channelsSkipped > 0 && ` ${slackImportResult.channelsSkipped} skipped.`}
+                      {slackImportResult.errors.length > 0 && (
+                        <div style={{ marginTop: 6, color: 'var(--color-error)' }}>
+                          {slackImportResult.errors.slice(0, 3).map((err, i) => (
+                            <div key={i}>{err}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </>
           )}
 
